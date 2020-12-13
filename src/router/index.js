@@ -44,6 +44,11 @@ export default new Router({
                     meta: {title: '用户设置'}
                 },
                 {
+                    path: '/rabbitmq/management',
+                    component: () => import('../components/page/rabbitmqManagement'),
+                    meta: {title: 'rabbitmq集群管理'}
+                },
+                {
                     path: '/404',
                     component: () => import(/* webpackChunkName: "404" */ '../components/page/404.vue'),
                     meta: { title: '404' }

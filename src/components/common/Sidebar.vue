@@ -97,12 +97,8 @@ export default {
                     title: 'rabbitmq面板',
                     subs: [
                         {
-                            index: 'rabbitmq-management',
+                            index: '/rabbitmq/management',
                             title: 'rabbitmq集群管理'
-                        },
-                        {
-                            index: 'rabbitmq-operation',
-                            title: 'rabbitmq集群控制'
                         }
                     ]
                 },

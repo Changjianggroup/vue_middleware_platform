@@ -7,6 +7,7 @@ const getters = {
   username: state => state.user.username,
   roles: state => state.user.roles,
   is_superuser: state => state.user.is_superuser,
-  redis_id: state => state.redis.server_id
+  redis_id: state => state.redis.server_id,
+  rabbitmq_id: state => state.rabbitmq.server_id
 }
 export default getters

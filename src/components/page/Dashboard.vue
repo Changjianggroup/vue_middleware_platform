@@ -22,7 +22,7 @@
             </el-col>
             <el-col :span="16">
                 <el-row :gutter="20" class="mgb202">
-                    <el-col :span="8">
+                    <el-col :span="10">
                         <el-card shadow="hover" :body-style="{padding: '0px'}">
                             <div class="grid-content grid-con-1">
                               <router-link to="/perm/user">
@@ -35,7 +35,7 @@
                             </div>
                         </el-card>
                     </el-col>
-                    <el-col :span="8">
+                    <el-col :span="10">
                         <el-card shadow="hover" :body-style="{padding: '0px'}">
                             <div class="grid-content grid-con-2">
                               <router-link to="/perm/group">
@@ -48,20 +48,35 @@
                             </div>
                         </el-card>
                     </el-col>
-                    <el-col :span="8">
-                        <el-card shadow="hover" :body-style="{padding: '0px'}">
-                            <div class="grid-content grid-con-3">
-                              <router-link to="/redis/management">
-                                <i class="el-icon-cpu grid-con-icon"></i>
-                              </router-link>
-                                <div class="grid-cont-right">
-                                    <div class="grid-num"> {{ redisClusterNum }}</div>
-                                    <div>redis集群</div>
-                                </div>
-                            </div>
-                        </el-card>
-                    </el-col>
                 </el-row>
+              <el-row :gutter="20" class="mgb203">
+              <el-col :span="10">
+                <el-card shadow="hover" :body-style="{padding: '0px'}">
+                  <div class="grid-content grid-con-3">
+                    <router-link to="/redis/management">
+                      <i class="el-icon-cpu grid-con-icon"></i>
+                    </router-link>
+                    <div class="grid-cont-right">
+                      <div class="grid-num"> {{ redisClusterNum }}</div>
+                      <div>redis集群</div>
+                    </div>
+                  </div>
+                </el-card>
+              </el-col>
+                <el-col :span="10">
+                  <el-card shadow="hover" :body-style="{padding: '0px'}">
+                    <div class="grid-content grid-con-3">
+                      <router-link to="/rabbitmq/management">
+                        <i class="el-icon-chat-dot-round grid-con-icon"></i>
+                      </router-link>
+                      <div class="grid-cont-right">
+                        <div class="grid-num"> {{ rabbitmqClusterNum }}</div>
+                        <div>rabbitmq集群</div>
+                      </div>
+                    </div>
+                  </el-card>
+                </el-col>
+              </el-row>
             </el-col>
         </el-row>
     </div>
@@ -71,12 +86,14 @@
 import { getServerList } from '@/api/redis_server'
 import { getUserList } from '@/api/users'
 import { getGroupList } from '@/api/groups'
+import { getRabbitmqServerList} from '@/api/rabbitmq_server'
 import { mapGetters } from 'vuex'
 export default {
     name: 'dashboard',
     data() {
       return {
         redisClusterNum: '',
+        rabbitmqClusterNum: '',
         userNum: '',
         groupNum: ''
       }
@@ -222,6 +239,9 @@ export default {
     margin-top: 10px;
 }
 .mgb202 {
+  margin-top: 50px;
+}
+.mgb203 {
   margin-top: 50px;
 }
 
