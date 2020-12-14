@@ -54,7 +54,7 @@ export default {
                   this.loading = false
                   this.$message({
                     type: 'error',
-                    message: error.response.data.non_field_errors[0]
+                    message: error.response
                   })
                 })
               }else {

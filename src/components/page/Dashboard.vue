@@ -86,7 +86,7 @@
 import { getServerList } from '@/api/redis_server'
 import { getUserList } from '@/api/users'
 import { getGroupList } from '@/api/groups'
-import { getRabbitmqServerList} from '@/api/rabbitmq_server'
+import { getRabbitmqServerList } from '@/api/rabbitmq_server'
 import { mapGetters } from 'vuex'
 export default {
     name: 'dashboard',
@@ -137,6 +137,11 @@ export default {
               this.groupNum = res.count
             }
         )
+          getRabbitmqServerList(this.params).then(
+              res => {
+                  this.rabbitmqClusterNum = res.count
+              }
+          )
       }
         }
 };

@@ -42,7 +42,7 @@
       </el-table-column>
       <el-table-column
         label="rabbitmq集群名"
-        min-width="100">
+        min-width="80">
         <template slot-scope="scope">
           <span>{{ scope.row.cluster_name }}</span>
         </template>
@@ -55,32 +55,36 @@
         </template>
       </el-table-column>
       <el-table-column
-          label="username"
-          min-width="50">
-        <template slot-scope="scope">
-          <span>{{ scope.row.username }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
         label="集群描述"
         min-width="100">
         <template slot-scope="scope">
           <span>{{ scope.row.description }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="控制" min-width="150">
+      <el-table-column label="控制" min-width="200">
         <template slot-scope="scope">
           <el-button
             size="mini"
             @click="serverEdit(scope.row)">编辑</el-button>
           <el-button
+                  size="mini"
+                  type="danger"
+                  @click="serverDelete(scope.row)">删除</el-button>
+          <el-button
             size="mini"
             type="success"
             @click="serverOperation(scope.row)">操作</el-button>
           <el-button
-            size="mini"
-            type="danger"
-            @click="serverDelete(scope.row)">删除</el-button>
+                  class="copyUsername"
+                  size="mini"
+                  type="success"
+                  @click="copyUsername(scope.row)">复制账号</el-button>
+          <el-button
+                  class="copyPassword"
+                  size="mini"
+                  type="success"
+                  @click="copyPassword(scope.row)">复制密码</el-button>
+
         </template>
       </el-table-column>
     </el-table>
@@ -88,7 +92,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'ServerList',
   props: {
@@ -127,7 +130,14 @@ export default {
       })
     },
     serverOperation(server) {
-      this.$emit('operation', server.id)
+      this.$emit('operation', server)
+    },
+    copyUsername(server) {
+      this.$emit('copyUsername', server.username)
+
+    },
+    copyPassword(server) {
+      this.$emit('copyPassword', server.password)
     }
   }
 }

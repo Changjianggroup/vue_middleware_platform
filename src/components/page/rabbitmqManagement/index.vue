@@ -25,7 +25,7 @@
         </el-col>
         <el-col :span="3"><div class="grid-content bg-purple"></div></el-col>
       </el-row>
-      <server-list ref="serverListTable" :values="server" @mulselect="handleSelectionChange" @edit="handleDialogUpdate" @delete="handleDeleteServer" @operation="handleOpertionServer"></server-list>
+      <server-list ref="serverListTable" :values="server" @mulselect="handleSelectionChange" @edit="handleDialogUpdate" @delete="handleDeleteServer" @operation="handleOpertionServer" @copyUsername="handleCopyUsername" @copyPassword="handleCopyPassword"></server-list>
       <el-dialog
           :visible.sync="dialogVisibleCreate"
           title="新增服务器"
@@ -78,9 +78,10 @@ export default {
   data() {
     return {
       serverid: '',
+      vauleUsername: '',
+      vaulePassword: '',
       server: [],
       multipleSelection: [],
-      manufactoryOption: [],
       serverOption: [],
       dialogVisibleCreate: false,
       dialogVisibleUpdate: false,
@@ -101,7 +102,7 @@ export default {
     }
   },
   created() {
-    // this.fetchData()
+    this.fetchData()
   },
   methods: {
     fetchData() {
@@ -189,12 +190,37 @@ export default {
           }
       )
     },
-    handleOpertionServer(id) {
-      // 操作rabbitmq查询、删除等操作
-      this.$store.state.rabbitmq.server_id = id
-      this.$router.push({
-        path: '/rabbitmq/operation'
-      })
+    handleOpertionServer(params) {
+      // 打开rabbitmq-management页面进行操作
+      window.open(params.url,'_blank')
+    },
+    handleCopyUsername(username) {
+      const input = document.createElement('input') // 新增一个input
+      input.style.position = 'relative' // 将它隐藏（注意不能使用display或者visibility，否则粘贴不上）
+      input.style.zIndex = '-9'
+      document.body.appendChild(input) // 追加
+      input.value = username // 设置文本框的内容
+      input.select() // 选中文本
+      document.execCommand('copy') // 执行浏览器复制命令
+      document.body.removeChild(input)
+      this.$message({
+        type: 'success',
+        message: '账户复制成功'
+      });
+    },
+    handleCopyPassword(password) {
+      const input = document.createElement('input') // 新增一个input
+      input.style.position = 'relative' // 将它隐藏（注意不能使用display或者visibility，否则粘贴不上）
+      input.style.zIndex = '-9'
+      document.body.appendChild(input) // 追加
+      input.value = password // 设置文本框的内容
+      input.select() // 选中文本
+      document.execCommand('copy') // 执行浏览器复制命令
+      document.body.removeChild(input)
+      this.$message({
+        type: 'success',
+        message: '密码复制成功'
+      });
     },
     handleCurrentChange(val) {
       // 分页

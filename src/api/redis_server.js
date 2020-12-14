@@ -77,3 +77,17 @@ export function createKey(params) {
     data: { id: params.id, key: params.key, value: params.value }
   })
 }
+export function clusterNode(id) {
+  return request({
+    url: '/redis/ops/cluster_node/',
+    method: 'post',
+    data: { id: id }
+  })
+}
+export function clusterInfo(id) {
+  return request({
+    url: '/redis/ops/cluster_info/',
+    method: 'post',
+    data: { id: id }
+  })
+}

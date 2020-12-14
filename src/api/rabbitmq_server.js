@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-
+import axios from 'axios';
 // 获取server列表
 export function getRabbitmqServerList(params) {
   return request({
@@ -34,3 +34,7 @@ export function updateRabbitmqServer(params) {
     data: params
   })
 }
+//登录rabbitmq-management
+//   export function loginRabbitmqManagement(params) {
+//   return axios.get(params.url,{username: params.username, password: params.password})
+// }

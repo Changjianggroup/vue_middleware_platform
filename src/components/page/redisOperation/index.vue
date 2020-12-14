@@ -65,8 +65,10 @@
         </div>
         <div class="grid-three">
           <div class="search_all_key">
-            <el-button type="primary" @click="handlershowALLKey">查看所有key</el-button>
+<!--            <el-button type="primary" @click="handlershowALLKey">查看所有key</el-button>-->
             <el-button type="primary" @click="handlershowDBSize">查看key数量(dbsize)</el-button>
+            <el-button type="primary" @click="handlershowClusterInfo">查看集群信息(cluster info)</el-button>
+            <el-button type="primary" @click="handlershowClusterNode">查看集群节点(cluster node)</el-button>
           </div>
         </div>
         <div class="grid-four">
@@ -132,7 +134,7 @@
 </template>
 
 <script>
-import { getServerList, showALLKey, showDBSize, getKey, getKeyTTL, delKey, createKey } from '@/api/redis_server'
+import { getServerList, showALLKey, showDBSize, getKey, getKeyTTL, delKey, createKey, clusterNode, clusterInfo } from '@/api/redis_server'
 // import { getSupplierList } from '@/api/supplier'
 // import { getManufactoryList } from '@/api/manufactory'
 // import { getIdcList } from '@/api/idc'
@@ -409,6 +411,66 @@ export default {
             })
           }
       )
+    },
+    handlershowClusterInfo() {
+      this.value_id = this.cluster_list.find(item => {
+        if (item.cluster_name === this.value_cluster_name) {
+          return item
+        }
+      }).id
+      clusterInfo(this.value_id).then(
+              // 获取cluster info
+              res => {
+                let msg = "\n"
+                if ( res.msg instanceof Object) {
+                  for(var key in  res.msg){
+                    msg = msg + key + ":" + '\n'
+                    msg = msg + res.msg[key] + '\n'
+                  }
+                  // msg = JSON.stringify(res.msg).toString()
+                } else {
+                  msg = res.msg
+                }
+                this.result_code = '返回code：' + res.code
+                this.result_msg = '返回结果：' + msg
+              },
+              err => {
+                this.$message({
+                  type: 'error',
+                  message: err
+                })
+              }
+      )
+    },
+    handlershowClusterNode() {
+      this.value_id = this.cluster_list.find(item => {
+        if (item.cluster_name === this.value_cluster_name) {
+          return item
+        }
+      }).id
+      clusterNode(this.value_id).then(
+              // 获取cluster info
+              res => {
+                let msg = "\n"
+                if ( res.msg instanceof Object) {
+                  for(var key in  res.msg){
+                    msg = msg + key + ":" + '\n'
+                    msg = msg + res.msg[key] + '\n'
+                  }
+                  // msg = JSON.stringify(res.msg).toString()
+                } else {
+                  msg = res.msg
+                }
+                this.result_code = '返回code：' + res.code
+                this.result_msg = '返回结果：' + msg
+              },
+              err => {
+                this.$message({
+                  type: 'error',
+                  message: err
+                })
+              }
+      )
     }
   }
 }
@@ -450,6 +512,7 @@ export default {
 .search_all_key {
   margin-left: 20px;
   padding: 5px;
+  width: 200%
 }
 .get_key_value {
   margin-left: 20px;
