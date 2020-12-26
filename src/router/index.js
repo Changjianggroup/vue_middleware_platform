@@ -29,7 +29,7 @@ export default new Router({
                     meta: {title: 'redis集群管理'}
                     },
                 {
-                    path: '/redis/operation',
+                    path: '/redis/request',
                     component: () => import('../components/page/redisOperation'),
                     meta: {title: 'redis操作'}
                     },
@@ -47,6 +47,21 @@ export default new Router({
                     path: '/rabbitmq/management',
                     component: () => import('../components/page/rabbitmqManagement'),
                     meta: {title: 'rabbitmq集群管理'}
+                },
+                {
+                    path: '/audit/login',
+                    component: () => import('../components/page/audit/login'),
+                    meta: {title: '登录日志'}
+                },
+                {
+                    path: '/audit/request',
+                    component: () => import('../components/page/audit/request'),
+                    meta: {title: 'API请求日志'}
+                },
+                {
+                    path: '/audit/dbcrud',
+                    component: () => import('../components/page/audit/dbcrud'),
+                    meta: {title: '数据库日志'}
                 },
                 {
                     path: '/404',

@@ -53,7 +53,7 @@
           <el-dialog
               :visible.sync="dialogVisiblePerm"
               :title="perDialogTitle"
-              width="60%">
+              width="70%">
             <group-perm ref="permform" :form="groupForms" :values="groupPerms" :list="permsList" @submit="handleSubmitGroupPerm" @cancel="handlePermCancel"></group-perm>
           </el-dialog>
         </div>
@@ -112,10 +112,10 @@ export default {
           this.totalNum = res.count
           this.loading = false
         },
-        error => {
+        err => {
           this.$message({
             type: 'error',
-            message: error
+            message: err.response.data.detail
           })
         }
       )
@@ -132,10 +132,10 @@ export default {
             message: '创建成功'
           })
         },
-        error => {
+        err => {
           this.$message({
             type: 'error',
-            message: error.response
+            message: err.response.data.detail
           })
         }
       )
@@ -225,7 +225,6 @@ export default {
     },
     handleDeleteGroupMember(value) {
       // 删除用户组成员
-      console.log(this.groupid)
       deleteGroupMember(this.groupid, value).then(
         () => {
           this.dialogVisibleUser = false

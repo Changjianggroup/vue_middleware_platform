@@ -177,13 +177,11 @@ export default {
           // 获取redis集群列表
           res => {
             this.server = res.results
-            // console.log(this.server)
             this.totalNum = res.count
             //
             this.cluster_list = this.server.map(item => {
               return { id: `${item.id}`, hosts: `${item.hosts}`, cluster_name: `${item.cluster_name}` }
             })
-            // console.log(this.cluster_name_list)
 
             if (this.$store.state.redis.server_id !== 0) {
               // this.value = this.$store.state.redis.server_id
@@ -244,7 +242,6 @@ export default {
     setSelectedClusterName() {
       this.value_cluster_name = this.cluster_options.find(item => {
         if (item.hosts === this.value_hosts) {
-          console.log(item.cluster_name)
           return item
         }
       }).cluster_name
@@ -400,7 +397,6 @@ export default {
       createKey(this.kwargs).then(
           // 获取redis集群列表
           res => {
-            console.log(res)
             this.result_code = '返回结果：' + res
             this.result_msg = ''
           },

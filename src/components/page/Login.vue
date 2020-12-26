@@ -54,11 +54,14 @@ export default {
                   this.loading = false
                   this.$message({
                     type: 'error',
-                    message: error.response
+                    message: error.response.data
                   })
                 })
               }else {
-                console.log('error submit!!')
+                  this.$message({
+                      type: 'error',
+                      message: '登录数据不全!!'
+                  })
                 return false
               }
             });

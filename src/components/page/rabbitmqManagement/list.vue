@@ -130,7 +130,7 @@ export default {
       })
     },
     serverOperation(server) {
-      this.$emit('operation', server)
+      this.$emit('request', server)
     },
     copyUsername(server) {
       this.$emit('copyUsername', server.username)

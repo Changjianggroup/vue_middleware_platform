@@ -11,12 +11,15 @@ import './assets/css/icon.css';
 import './components/common/directives';
 import 'babel-polyfill';
 import '@/permission'
-
+import Pagination from '@/components/common/Pagination'
+import { resetForm } from '@/utils'
 Vue.config.productionTip = false;
+Vue.prototype.resetForm = resetForm;
 Vue.use(VueI18n);
 Vue.use(ElementUI, {
     size: 'small'
 });
+Vue.component('Pagination', Pagination)
 const i18n = new VueI18n({
     locale: 'zh',
     messages

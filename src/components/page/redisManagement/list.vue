@@ -114,7 +114,7 @@ export default {
       })
     },
     serverOperation(server) {
-      this.$emit('operation', server.id)
+      this.$emit('request', server.id)
     }
   }
 }

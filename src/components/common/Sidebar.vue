@@ -86,7 +86,7 @@ export default {
                       title: 'redis集群管理'
                     },
                     {
-                      index: '/redis/operation',
+                      index: '/redis/request',
                       title: 'redis集群控制',
                     }
                   ]
@@ -99,6 +99,25 @@ export default {
                         {
                             index: '/rabbitmq/management',
                             title: 'rabbitmq集群管理'
+                        }
+                    ]
+                },
+                {
+                    icon: 'el-icon-edit-outline',
+                    index: 'audit',
+                    title: '审计面板',
+                    subs: [
+                        {
+                            index: '/audit/login',
+                            title: '登录日志'
+                        },
+                        {
+                            index: '/audit/request',
+                            title: 'API请求日志'
+                        },
+                        {
+                            index: '/audit/dbcrud',
+                            title: '数据库操作日志'
                         }
                     ]
                 },

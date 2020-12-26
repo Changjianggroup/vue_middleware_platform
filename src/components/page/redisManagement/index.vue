@@ -197,7 +197,7 @@ export default {
       // 操作redis 查询、删除等操作
       this.$store.state.redis.server_id = id
       this.$router.push({
-        path: '/redis/operation'
+        path: '/redis/request'
       })
     },
     handleCurrentChange(val) {

@@ -110,7 +110,7 @@ export default {
         error => {
           this.$message({
             type: 'error',
-            message: error
+            message: error.response.data.detail
           })
         }
       )
@@ -130,7 +130,7 @@ export default {
         error => {
           this.$message({
             type: 'error',
-            message: error.response
+            message: error.response.data.detail
           })
         }
       )
@@ -149,7 +149,7 @@ export default {
         error => {
           this.$message({
             type: 'error',
-            message: error
+            message: error.response.data.detail
           })
         })
     },
@@ -167,7 +167,7 @@ export default {
         error => {
           this.$message({
             type: 'error',
-            message: error
+            message: error.response.data.detail
           })
         }
       )
@@ -203,10 +203,10 @@ export default {
             message: '删除成功!'
           })
         },
-        err => {
+        error => {
           this.$message({
             type: 'error',
-            message: err.response.data.detail
+            message: error.response.data.detail
           })
         }
       )
