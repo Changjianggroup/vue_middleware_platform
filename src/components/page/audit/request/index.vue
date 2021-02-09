@@ -72,6 +72,7 @@
             <el-table-column label="请求相对路径" width="180" align="center" prop="url"  />
             <el-table-column label="请求方法" align="center" prop="method" width="150"  />
             <el-table-column label="请求参数" width="200" align="center" prop="query_string"  />
+            <el-table-column label="提交数据" width="200" align="center" prop="post_data"  />
             <el-table-column label="请求IP地址" align="center" prop="remote_ip" width="200" />
             <el-table-column label="操作时间" align="center" prop="datetime" width="250" />
             <!--            <el-table-column label="用户名" align="center" prop="user_id" width="50" :formatter="formatLoginType">-->
@@ -118,7 +119,34 @@
                     page_size: 10,
                     user_id: undefined,
                     remote_ip: undefined
-                }
+                },
+              start_date: '',
+              end_date: '',
+              pickerOptions: {
+                disabledDate(time) {
+                  return time.getTime() > Date.now();
+                },
+                shortcuts: [{
+                  text: '今天',
+                  onClick(picker) {
+                    picker.$emit('pick', new Date());
+                  }
+                }, {
+                  text: '昨天',
+                  onClick(picker) {
+                    const date = new Date();
+                    date.setTime(date.getTime() - 3600 * 1000 * 24);
+                    picker.$emit('pick', date);
+                  }
+                }, {
+                  text: '一周前',
+                  onClick(picker) {
+                    const date = new Date();
+                    date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+                    picker.$emit('pick', date);
+                  }
+                }]
+              }, 
             }
         },
         created() {
@@ -153,6 +181,7 @@
             /** 搜索按钮操作 */
             handleQuery() {
                 this.queryParams.page = 1
+                this.queryParams.user_id = undefined
                 for (let i in this.userList) {
                     if (this.username === this.userList[i]['username']) {
                         this.queryParams.user_id = this.userList[i]['id']
@@ -188,8 +217,8 @@
                 }).then(() => {
                     this.downloadLoading = true
                     import('@/utils/Export2Excel').then(excel => {
-                        const tHeader = ['编号', 'id', '请求相对路径','请求方法', '请求参数', '请求IP地址', '操作时间','用户ID','用户名']
-                        const filterVal = ['num', 'id','url', 'remote_ip', 'method', 'query_string','datetime','user_id', 'username']
+                        const tHeader = ['编号', 'id', '请求相对路径','请求方法', '请求参数','提交数据', '请求IP地址', '操作时间','用户ID','用户名']
+                        const filterVal = ['num', 'id','url', 'remote_ip', 'method', 'query_string', 'post_data','datetime','user_id', 'username']
                         for (let i in this.list ) {
                             for ( let j in this.userList){
                                 if (this.list[i]['user_id'] === this.userList[j]['id']) {

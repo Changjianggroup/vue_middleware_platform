@@ -8,7 +8,6 @@ export function getServerList(params) {
     params
   })
 }
-
 // 创建server
 export function createServer(params) {
   return request({

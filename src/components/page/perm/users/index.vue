@@ -34,7 +34,8 @@
               :visible.sync="dialogVisibleUpdate"
               title="修改用户信息"
               width="50%">
-            <user-form :form="detailForm" :value="updateString" @submit="handleSubmitUpdate" @cancel="handleUpdateCancel"></user-form>
+          <update-user-form :form="detailForm" :value="updateString" @submit="handleSubmitUpdate" @cancel="handleUpdateCancel"></update-user-form>
+
           </el-dialog>
           <el-dialog
               :visible.sync="dialogVisibleGroup"
@@ -66,12 +67,13 @@ import { getUserList, createUser, updateUser, deleteUser, updateUserGroup, chang
 import { getGroupList } from '@/api/groups'
 import UserList from './user-list'
 import UserForm from './user-form'
+import UpdateUserForm from './update-user-form'
 import UpdateUgroup from './update-ugroup'
 import ChangePass from './change-upass'
 
 export default {
   name: 'User',
-  components: { UserList, UserForm, UpdateUgroup, ChangePass },
+  components: { UserList, UserForm, UpdateUserForm, UpdateUgroup, ChangePass },
   data() {
     return {
       groupList: [],

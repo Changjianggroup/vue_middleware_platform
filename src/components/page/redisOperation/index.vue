@@ -162,7 +162,7 @@ export default {
       params: {
         page: 1,
         keywords: '',
-        page_size: 10
+        page_size: 10000
       },
       kwargs: {}
     }
@@ -417,11 +417,20 @@ export default {
       clusterInfo(this.value_id).then(
               // 获取cluster info
               res => {
-                let msg = "\n"
+                let msg = ""
                 if ( res.msg instanceof Object) {
                   for(var key in  res.msg){
-                    msg = msg + key + ":" + '\n'
-                    msg = msg + res.msg[key] + '\n'
+                    msg = msg + '\n'
+                    msg = msg + "集群节点" + key + ":" + '\n'
+                    if (res.msg[key] instanceof Object){
+                      for (var value_key in res.msg[key]) {
+                        msg = msg + value_key + ":" + '\n'
+                        msg = msg + res.msg[key][value_key] + '\n'
+                      }
+                    } else {
+                      msg = msg + res.msg[key] + '\n'
+                    }
+
                   }
                   // msg = JSON.stringify(res.msg).toString()
                 } else {
@@ -447,15 +456,23 @@ export default {
       clusterNode(this.value_id).then(
               // 获取cluster info
               res => {
-                let msg = "\n"
-                if ( res.msg instanceof Object) {
-                  for(var key in  res.msg){
-                    msg = msg + key + ":" + '\n'
-                    msg = msg + res.msg[key] + '\n'
+                let msg = ""
+                if (res.code === 200){
+                  for (var i in res.msg)
+                  {
+                    msg = msg + '\n'
+                    msg = msg + "集群节点" + res.msg[i]['host'] + ":" + res.msg[i]['port'] + "\n"
+                    msg = msg + 'id:' + res.msg[i]['id'] + '\n'
+                    msg = msg + 'cluster-bus-port:' + res.msg[i]['cluster-bus-port'] + '\n'
+                    msg = msg + 'flags:' + res.msg[i]['flags'] + '\n'
+                    msg = msg + 'master:' + res.msg[i]['master'] + '\n'
+                    msg = msg + 'ping-sent:' + res.msg[i]['ping-sent'] + '\n'
+                    msg = msg + 'pong-recv:' + res.msg[i]['pong-recv'] + '\n'
+                    msg = msg + 'link-state:' + res.msg[i]['link-state'] + '\n'
+                    msg = msg + 'migrations:' + res.msg[i]['migrations'] + '\n'
                   }
-                  // msg = JSON.stringify(res.msg).toString()
                 } else {
-                  msg = res.msg
+                  msg = msg + res.msg
                 }
                 this.result_code = '返回code：' + res.code
                 this.result_msg = '返回结果：' + msg
@@ -463,7 +480,7 @@ export default {
               err => {
                 this.$message({
                   type: 'error',
-                  message: err
+                  message: err.response
                 })
               }
       )

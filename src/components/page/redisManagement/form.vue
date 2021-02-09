@@ -51,7 +51,7 @@ export default {
           { required: true, message: '请输入redis hosts列表', trigger: 'blur' },
           { validator: function(rule, value, callback) {
             // 校验中文的正则：/^\[(('|")(\d{1,3}\.){3}\d{1,3}:\d{1,5}('|"),?)+\]$/
-            if (/^\[('(\d{1,3}\.){3}\d{1,3}:\d{1,5}',?)+\]$/.test(value) === false) {
+            if (/^\[('(\d{1,3}\.){3}\d{1,3}:\d{1,5}'\,?)+\]$/.test(value) === false) {
               callback(new Error("请按要求输入redis列表，要求['ip1:port1','ip2:port2',...]"))
             } else {
               // 校验通过

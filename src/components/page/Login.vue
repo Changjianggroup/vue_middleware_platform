@@ -54,7 +54,7 @@ export default {
                   this.loading = false
                   this.$message({
                     type: 'error',
-                    message: error.response.data
+                    message: error.response
                   })
                 })
               }else {
@@ -83,7 +83,7 @@ export default {
     line-height: 50px;
     text-align: center;
     font-size: 20px;
-    color: #fff;
+    color: #000000;
     border-bottom: 1px solid #ddd;
 }
 .ms-login {

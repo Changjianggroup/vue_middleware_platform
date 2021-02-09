@@ -38,7 +38,7 @@
                         <i class="el-icon-caret-bottom"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item>用户管理</el-dropdown-item>
+    			<el-dropdown-item ><router-link :to="{path:'/perm/users'}">用户管理</router-link ></el-dropdown-item>
                         <el-dropdown-item divided command="loginout">退出登录</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>

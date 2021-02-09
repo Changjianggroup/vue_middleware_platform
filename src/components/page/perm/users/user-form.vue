@@ -10,6 +10,9 @@
       <el-form-item label="邮箱地址" prop="email">
         <el-input v-model="form.email" placeholder="请输入email"></el-input>
       </el-form-item>
+       <el-form-item label="电话" prop="password">
+        <el-input v-model="form.phone" placeholder="请输入密码"></el-input>
+      </el-form-item>  
       <el-form-item class="button-right">
         <el-button size="small" @click="cancelForm">取消</el-button>
         <el-button size="small" type="primary" @click="submitForm">{{ value }}</el-button>
