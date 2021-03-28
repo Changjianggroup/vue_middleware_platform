@@ -25,43 +25,28 @@ export default new Router({
                 },
                 {
                     path: '/redis/management',
-                    component: () => import('../components/page/redisManagement'),
+                    component: () => import('../components/page/redis/manage'),
                     meta: {title: 'redis集群管理'}
                     },
                 {
-                    path: '/redis/request',
-                    component: () => import('../components/page/redisOperation'),
+                    path: '/redis/ops',
+                    component: () => import('../components/page/redis/opertation'),
                     meta: {title: 'redis操作'}
                     },
                 {
                     path: '/perm/groups',
-                    component: () => import('../components/page/perm/groups'),
-                    meta: {title: '组设置'}
+                    component: () => import('../components/page/url_premission/groups'),
+                    meta: {title: '权限组设置'}
                 },
                 {
                     path: '/perm/users',
-                    component: () => import('../components/page/perm/users'),
+                    component: () => import('../components/page/url_premission/users'),
                     meta: {title: '用户设置'}
                 },
                 {
-                    path: '/rabbitmq/management',
-                    component: () => import('../components/page/rabbitmqManagement'),
-                    meta: {title: 'rabbitmq集群管理'}
-                },
-                {
-                    path: '/audit/login',
-                    component: () => import('../components/page/audit/login'),
-                    meta: {title: '登录日志'}
-                },
-                {
-                    path: '/audit/request',
-                    component: () => import('../components/page/audit/request'),
-                    meta: {title: 'API请求日志'}
-                },
-                {
-                    path: '/audit/dbcrud',
-                    component: () => import('../components/page/audit/dbcrud'),
-                    meta: {title: '数据库日志'}
+                    path: '/audit/list',
+                    component: () => import('../components/page/audit/index'),
+                    meta: {title: '审计日志'}
                 },
                 {
                     path: '/404',

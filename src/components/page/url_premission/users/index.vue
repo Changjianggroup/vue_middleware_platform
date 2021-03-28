@@ -41,7 +41,7 @@
               :visible.sync="dialogVisibleGroup"
               title="更改用户组"
               width="50%">
-            <update-ugroup :form="detailForm" :glist.sync="groupList" :goption="groupOption" @submit="handleSubmitUpdateUserGroup" @cancel="handleGroupCancel"></update-ugroup>
+            <update-ugroup :form="detailForm" :gobj.sync="groupobj" :goption="groupOption" @submit="handleSubmitUpdateUserGroup" @cancel="handleGroupCancel"></update-ugroup>
           </el-dialog>
           <el-dialog
               :visible.sync="dialogVisiblePass"
@@ -63,8 +63,8 @@
 </template>
 
 <script>
-import { getUserList, createUser, updateUser, deleteUser, updateUserGroup, changeUserPass } from '@/api/users'
-import { getGroupList } from '@/api/groups'
+import { getUserList, createUser, updateUser, deleteUser, changeUserPass } from '@/api/users'
+import { updateUserGroup, getPermissionGroupList } from '@/api/url_premission'
 import UserList from './user-list'
 import UserForm from './user-form'
 import UpdateUserForm from './update-user-form'
@@ -76,7 +76,7 @@ export default {
   components: { UserList, UserForm, UpdateUserForm, UpdateUgroup, ChangePass },
   data() {
     return {
-      groupList: [],
+      groupobj: {},
       groupOption: [],
       user: [],
       dialogVisibleCreate: false,
@@ -105,8 +105,8 @@ export default {
       getUserList(this.params).then(
         // 获取user列表信息
         res => {
-          this.user = res.results
-          this.totalNum = res.count
+          this.user = res
+          this.totalNum = res.length
           this.loading = false
         },
         error => {
@@ -139,33 +139,39 @@ export default {
     },
     handleSubmitUpdate(value) {
       // 更新用户信息
-      updateUser(value).then(
-        () => {
-          this.dialogVisibleUpdate = false
-          this.fetchData()
+      updateUser(value).then(() => {
           this.$message({
             type: 'success',
-            message: '更新成功'
-          })
-        },
-        error => {
-          this.$message({
-            type: 'error',
-            message: error.response.data.detail
-          })
-        })
+            message: '更新用户信息成功'
+      })
+            this.dialogVisibleUpdate = false
+      }
+      ).catch(err => {this.$message({
+        type: 'error',
+        message: err
+      })
+    })
     },
-    handleSubmitUpdateUserGroup(id, value) {
+    handleSubmitUpdateUserGroup(id, userid) {
       // 更新用户属组事件
-      updateUserGroup(id, value).then(
-        () => {
+      const users = [userid]
+      const data = {id: id , users: users}
+      updateUserGroup(data).then(
+          response => {
           this.dialogVisibleGroup = false
           this.fetchData()
-          this.$message({
-            type: 'success',
-            message: '更新成功'
-          })
-        },
+            if(response.code === 200 || response.code === 201){
+              this.$message({
+                type: 'success',
+                message: response.message
+              })
+            }else{
+              this.$message({
+                type: 'error',
+                message: response.message
+              })
+            }
+        }).catch(
         error => {
           this.$message({
             type: 'error',
@@ -181,16 +187,20 @@ export default {
     },
     handleUpdateGroup(value) {
       // 更新用户属组
-      this.groupList = []
+      if (value.groups.length === 0) {
+        this.groupobj = {}
+      }
+      else{
+        this.groupobj = value.groups
+      }
       this.detailForm = value
       this.dialogVisibleGroup = true
-      getGroupList().then(
+      getPermissionGroupList().then(
         // 获取所有用户组列表
         res => {
-          this.groupOption = res.results
+          this.groupOption = res.result
         }
       )
-      this.groupList = value.groups.map(item => item.id)
     },
     handleDelete(id) {
       deleteUser(id).then(

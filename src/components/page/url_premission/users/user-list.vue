@@ -25,9 +25,7 @@
         min-width="220"
       >
         <template slot-scope="scope">
-          <div v-for="(item, index) in scope.row.groups" :key="index" style="float:left">
-            <el-tag style="margin-right: 3px" size="mini" >{{ item.name }}</el-tag>
-          </div>
+            <el-tag style="margin-right: 3px" size="mini" >{{ scope.row.groups.group_name }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="操作" min-width="300">

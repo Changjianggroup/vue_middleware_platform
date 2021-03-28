@@ -1,8 +1,11 @@
 <template>
   <div>
     <el-form ref="form" :model="form" :rules="rules" label-width="100px" class="idc-form">
-      <el-form-item label="用户组名" prop="name">
-        <el-input v-model="form.name" placeholder="请输入组名"></el-input>
+      <el-form-item label="权限组名" prop="group_name">
+        <el-input v-model="form.group_name" placeholder="请输入组名"></el-input>
+      </el-form-item>
+      <el-form-item label="描述" prop="desc">
+        <el-input v-model="form.desc" placeholder="请输入描述"></el-input>
       </el-form-item>
       <el-form-item class="button-right">
         <el-button size="small" @click="cancelForm">取消</el-button>
@@ -21,7 +24,8 @@ export default {
       type: Object,
       default: function() {
         return {
-          name: ''
+          group_name: '',
+          desc: '',
         }
       }
     },
@@ -33,8 +37,8 @@ export default {
   data() {
     return {
       rules: {
-        name: [
-          { required: true, message: '请输入机房名称', trigger: 'blur' },
+        group_name: [
+          { required: true, message: '请输入权限组名', trigger: 'blur' },
           { max: 80, message: '长度不能超过80个字符', trigger: 'blur' }
         ]
       }

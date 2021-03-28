@@ -1,8 +1,8 @@
 <template>
   <div>
     <el-form ref="form" :model="form" :rules="rules" label-width="120px" class="server-form">
-      <el-form-item label="redis集群名" prop="cluster_name">
-        <el-input v-model="form.cluster_name" placeholder="请输入redis集群名"></el-input>
+      <el-form-item label="redis集群名" prop="name">
+        <el-input v-model="form.name" placeholder="请输入redis集群名"></el-input>
       </el-form-item>
       <el-form-item label="redis host列表" prop="hosts" >
         <el-input v-model="form.hosts" placeholder="请输入hosts列表，如['ip1:port1','ip2:port2']这种形式"></el-input>
@@ -45,7 +45,7 @@ export default {
   data() {
     return {
       rules: {
-        cluster_name: [
+        name: [
           { required: true, message: '请输入redis集群名字', trigger: 'blur' }],
         hosts: [
           { required: true, message: '请输入redis hosts列表', trigger: 'blur' },
@@ -82,6 +82,12 @@ export default {
     },
     cancelForm() {
       this.$emit('cancel')
+    },
+    reset() {
+      this.form.name = ''
+      this.form.hosts = ''
+      this.form.password = ''
+      this.form.description = ''
     }
   }
 }

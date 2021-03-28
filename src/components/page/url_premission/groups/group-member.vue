@@ -1,12 +1,18 @@
 <template>
   <div class="groupmember">
+
     <el-table
       :data="values"
       style="width: 100%">
       <el-table-column
-        label="用户名"
-        min-width= "180"
+        label="用户id"
+        min-width= "80"
       >
+        <template slot-scope="scope">
+          <span>{{ scope.row.id }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="用户名">
         <template slot-scope="scope">
           <span>{{ scope.row.username }}</span>
         </template>
@@ -24,12 +30,18 @@
 </template>
 
 <script>
+import {getUserList} from '@/api/users'
 export default {
   name: 'GroupMember',
   props: {
     values: {
       type: Array,
       default: () => []
+    }
+  },
+  data() {
+    return {
+      users_list: [],
     }
   },
   methods: {
@@ -46,8 +58,20 @@ export default {
           message: '已取消删除'
         })
       })
-    }
-  }
+    },
+    getUsername(id) {
+      const queryParams = {id: id}
+      getUserList(queryParams).then( res =>{
+            const user_dict = {id: id, user_name: res}
+            this.users_list.push(user_dict)
+          }
+      ).catch(() => {
+        const user_dict = {id: id, user_name: 'unkonw'}
+        this.users_list.push(user_dict)
+      })
+    },
+  },
+
 }
 
 </script>

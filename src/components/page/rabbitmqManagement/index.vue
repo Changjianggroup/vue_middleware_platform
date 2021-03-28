@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import { getRabbitmqServerList, createRabbitmqServer, deleteRabbitmqServer, updateRabbitmqServer } from '@/api/rabbitmq_server'
+import { getRabbitmqServerList, createRabbitmqServer, deleteRabbitmqServer, updateRabbitmqServer } from '@/api/rabbitmq'
 import ServerList from './list'
 import ServerForm from './form'
 

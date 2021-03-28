@@ -2,7 +2,7 @@
   <div>
     <div class="crumbs">
       <el-breadcrumb separator="/">
-        <el-breadcrumb-item><i class="el-icon-lx-emoji"></i>组设置</el-breadcrumb-item>
+        <el-breadcrumb-item><i class="el-icon-lx-emoji"></i>权限组设置</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <div class="container">
@@ -10,17 +10,17 @@
         <div class="header-class">
           <el-row :gutter="20">
             <el-col :span="6"><div class="grid-content bg-purple">
-              <el-button type="primary" size="mini" @click="dialogVisibleCreate = true">创建用户组</el-button>
+              <el-button type="primary" size="mini" @click="dialogVisibleCreate = true">创建权限组</el-button>
             </div>
             </el-col>
             <el-col :span="8"><div class="grid-content bg-purple"></div></el-col>
-            <el-col :span="6">
-              <div class="grid-content bg-purple">
-                <el-input v-model="params.name" placeholder="请输入内容" class="input-with-select" @keyup.enter.native="handleFilter">
-                  <el-button slot="append" icon="el-icon-search" @click="handleFilter"></el-button>
-                </el-input>
-              </div>
-            </el-col>
+<!--            <el-col :span="6">-->
+<!--              <div class="grid-content bg-purple">-->
+<!--                <el-input v-model="params.name" placeholder="请输入内容" class="input-with-select" @keyup.enter.native="handleFilter">-->
+<!--                  <el-button slot="append" icon="el-icon-search" @click="handleFilter"></el-button>-->
+<!--                </el-input>-->
+<!--              </div>-->
+<!--            </el-col>-->
             <el-col :span="4"><div class="grid-content bg-purple"></div></el-col>
           </el-row>
           <group-list :values="group" :loading="loading" @edit="handleUpdate" @editPerm="handleEditPerm" @delete="handleDelete" @list="handlelistMember"></group-list>
@@ -32,7 +32,7 @@
           </el-dialog>
           <el-dialog
               :visible.sync="dialogVisibleUpdate"
-              title="修改用户信息"
+              title="修改权限组信息"
               width="50%">
             <group-form :form="detailForm" :value="updateString" @submit="handleSubmitUpdate" @cancel="handleUpdateCancel"></group-form>
           </el-dialog>
@@ -46,7 +46,7 @@
           </div>
           <el-dialog
               :visible.sync="dialogVisibleUser"
-              :title="groupname"
+              :title="group_name"
               width="50%">
             <group-member :values="member" @delete="handleDeleteGroupMember"></group-member>
           </el-dialog>
@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import { getGroupList, createGroup, updateGroup, deleteGroup, deleteGroupMember, getPermission, updateGroupPerm } from '@/api/groups'
+import { getPermissionGroupList, createPermissionGroup, deletePermissionGroup, getUrlPermission,updateGroupPerm, deleteGroupUserMember,updatePermissionGroup} from '@/api/url_premission'
 import GroupList from './group-list'
 import GroupForm from './group-form'
 import GroupMember from './group-member'
@@ -79,9 +79,9 @@ export default {
       group: [],
       member: [],
       permsList: [],
-      groupname: '',
+      group_name: '',
       perDialogTitle: '',
-      groupid: '',
+      group_id: '',
       groupPerms: [],
       dialogVisibleCreate: false,
       dialogVisibleUpdate: false,
@@ -95,9 +95,19 @@ export default {
       currentPage1: 1,
       params: {
         page: 1,
-        name: '',
+        group_name: undefined,
         page_size: 10
-      }
+      },
+      queryUrlAllParams: {
+        control: true,
+      },
+      queryUrlParams: {
+        control: true,
+        group_id: '',
+      },
+      all_perm: [],
+      disable_perm: [],
+      active_perm:[],
     }
   },
   created() {
@@ -105,11 +115,11 @@ export default {
   },
   methods: {
     fetchData() {
-      getGroupList(this.params).then(
+      getPermissionGroupList(this.params).then(
         // 获取所有用户组
         res => {
-          this.group = res.results
-          this.totalNum = res.count
+          this.group = res.result
+          this.totalNum = res.total
           this.loading = false
         },
         err => {
@@ -122,27 +132,28 @@ export default {
     },
     handleSubmitCreate(value) {
       // 创建用户组
-      createGroup(value).then(
-        () => {
+      value.users = [0]
+      createPermissionGroup(value).then(
+        result => {
           this.fetchData()
-          this.$refs.gform.$refs.form.resetFields()
           this.dialogVisibleCreate = false
           this.$message({
             type: 'success',
-            message: '创建成功'
+            message: result.message
           })
         },
         err => {
           this.$message({
             type: 'error',
-            message: err.response.data.detail
+            message: err.response.message
           })
         }
       )
     },
     handleSubmitUpdate(value) {
-      // 编辑更新用户组
-      updateGroup(value).then(
+      // 编辑更新用户组updatePermissionGroup
+      const data = {id: value.id, group_name:value.group_name, desc: value.desc}
+      updatePermissionGroup(data).then(
         () => {
           this.fetchData()
           this.dialogVisibleUpdate = false
@@ -158,23 +169,52 @@ export default {
           })
         })
     },
+   getDiffrenceSetData (dataA, dataB) {
+    for (let i = dataA.length - 1; i >= 0; i--) {
+    for (let j = 0; j  < dataB.length; j++) {
+      if (dataA[i].id === dataB[j].id) {
+        dataA.splice(i, 1);
+        break;
+       }
+      }
+    }
+  return dataA;
+  },
     handleEditPerm(value) {
       // 更新用户组的权限
       this.groupForms = value
-      this.dialogVisiblePerm = true
-      getPermission().then(
-        res => {
-          this.permsList = res
-        },
-        err => {
-          this.$message({
-            type: 'error',
-            message: err.response.data.detail
-          })
-        }
-      )
-      this.perDialogTitle = value.name + '组权限修改'
-      this.groupPerms = value.perm.map(item => item.id)
+      this.perDialogTitle = value.group_name + '组权限修改'
+      getUrlPermission(this.queryUrlAllParams).then( response1=> {
+        console.log(response1)
+           this.all_perm = response1.result
+        const all_perm_list = Object.assign({}, this.all_perm);
+        this.queryUrlParams.group_id = value.id
+        getUrlPermission(this.queryUrlParams).then(response2 => {
+          this.active_perm = response2.result
+          this.disable_perm = this.getDiffrenceSetData(all_perm_list , this.active_perm)
+          if(this.active_perm === "") {
+            this.active_perm = []
+          }
+          if (this.disable_perm === "") {
+            this.disable_perm = []
+          }
+          const active_lst = []
+          for(let index in this.active_perm) {
+            active_lst.push(this.active_perm[index].id)
+          }
+          this.groupPerms = active_lst
+          this.permsList = this.all_perm
+          this.dialogVisiblePerm = true
+          // this.$refs.permform.$forceUpdate()
+        }).catch(err2=> {this.$message({
+          type: 'error',
+          message: err2
+        })})
+      }).catch(err1=> {this.$message({
+        type: 'error',
+        message: err1
+      })})
+      // this.groupPerms = value.perm.map(item => item.id)
     },
     handleUpdate(value) {
       // 弹出用户组更新对话框
@@ -183,7 +223,7 @@ export default {
     },
     handleDelete(id) {
       // 删除用户组
-      deleteGroup(id).then(
+      deletePermissionGroup(id).then(
         () => {
           if (this.totalNum % this.params.page_size === 1) {
             this.params.page = this.params.page - 1
@@ -193,54 +233,72 @@ export default {
             type: 'success',
             message: '删除成功!'
           })
-        },
-        err => {
-          this.$message({
-            type: 'error',
-            message: err.response.data.detail
-          })
-        }
+        }).catch(
+          err => {
+            this.$message({
+              type: 'error',
+              message: err.response.data.detail
+            })
+          }
       )
     },
     handleSubmitGroupPerm(id, value) {
       // 更新用户组权限
-      updateGroupPerm(id, value).then(
-        () => {
+      const data = {id: id , urls: value}
+      updateGroupPerm(data).then(
+        response => {
           this.dialogVisiblePerm = false
           this.fetchData()
-          this.$message({
-            type: 'success',
-            message: '更新成功'
-          })
-        })
+          if(response.code === 200 || response.code === 201)
+          {
+            this.$message({
+              type: 'success',
+              message: response.message
+            })
+          }else{
+            this.$message({
+              type: 'error',
+              message: response.message
+            })
+          }
+    }).catch( err=> {
+        this.$message({
+          type: 'error',
+          message: err
+        })})
       this.$refs.permform.$refs.trans.clearQuery('left')
       this.$refs.permform.$refs.trans.clearQuery('right')
     },
     handlelistMember(value) {
       // 获取用户组成员列表
-      this.groupname = value.name + '组成员列表'
+      this.group_id = value.id
+      this.group_name = value.group_name + '组成员列表'
       this.dialogVisibleUser = true
       this.member = value.users
-      this.groupid = value.id
     },
     handleDeleteGroupMember(value) {
       // 删除用户组成员
-      deleteGroupMember(this.groupid, value).then(
-        () => {
-          this.dialogVisibleUser = false
-          this.fetchData()
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          })
-        },
-        err => {
-          this.$message({
-            type: 'error',
-            message: err.response.data.detail
-          })
-        }
-      )
+      const data = {id: this.group_id, user_id: value.id}
+      deleteGroupUserMember(data).then(
+          response => {
+            if(response.code === 200 || response.code === 201){
+              this.$message({
+                type: 'success',
+                message: response.message
+              })
+            }else{
+              this.$message({
+                type: 'error',
+                message: response.message
+              })
+            }
+          }).catch( err=> {
+        this.$message({
+          type: 'error',
+          message: err
+        })})
+            this.dialogVisibleUser = false
+            this.fetchData()
     },
     handleCurrentChange(val) {
       // 分页跳转

@@ -1,19 +1,19 @@
 <template>
   <div class="groupperm">
     <el-form ref="form" :model="form" label-width="100px" class="group-perm">
-      <el-form-item label="组名" prop="name">
-        <el-input v-model="form.name" :readonly="true" ></el-input>
+      <el-form-item label="组名" prop="group_name">
+        <el-input v-model="form.group_name" :readonly="true" ></el-input>
       </el-form-item>
-      <el-form-item label="用户组" prop="perm">
+      <el-form-item label="url访问权限" prop="url_permission">
         <div class="user-transfer">
           <el-transfer
                   ref="trans"
-                  v-model="permList"
+                  v-model="groupPermList"
                   :data="list"
                   :titles="['可选权限', '已选权限']"
                   :props="{
             key: 'id',
-            label: 'name'
+            label: 'description'
           }"
                   filterable
                   filter-placeholder="请输入内容">
@@ -54,19 +54,19 @@ export default {
   },
   data() {
     return {
-      permList: this.values
+      groupPermList: this.values,
     }
   },
   watch: {
     values() {
-      this.permList = this.values
+      this.groupPermList = this.values
     }
   },
   methods: {
     submitForm() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          this.$emit('submit', this.form.id, this.permList)
+          this.$emit('submit', this.form.id, this.groupPermList)
         } else {
           return
         }
@@ -80,7 +80,7 @@ export default {
 
 </script>
 
-<style scoped>
+<style>
 .group-perm {
   position: relative;
   display: block;
@@ -88,8 +88,18 @@ export default {
     .button-right {
       text-align: right;
   }
-.user-transfer >>> .el-transfer-panel {
-  width:250px;
+/*.user-transfer >>> .el-transfer-panel {*/
+/*  width:250px;*/
+/*}*/
+
+
+.el-transfer-panel__list.is-filterable {
+  width: 280px;
+  height: 500px;
+}
+.el-transfer-panel {
+  width: 280px;
+  height: 600px;
 }
 
 </style>

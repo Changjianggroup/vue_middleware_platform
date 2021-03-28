@@ -6,6 +6,30 @@
       </el-breadcrumb>
     </div>
     <div class="container">
+      <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="120px">
+        <el-form-item label="根据集群名查询" prop="name">
+          <el-input
+              v-model="queryParams.name"
+              placeholder="请输入集群名(部分字符)"
+              clearable
+              style="width: 240px;"
+              size="small"    />
+        </el-form-item>
+        <el-form-item label="根据集群ip查询" prop="hosts">
+          <el-input
+              v-model="queryParams.hosts"
+              placeholder="请输入用户名称"
+              clearable
+              style="width: 240px;"
+              size="small"
+          />
+        </el-form-item>
+          <el-form-item>
+            <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+            <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+          </el-form-item>
+      </el-form>
+
       <el-row :gutter="20">
         <el-col :span="3" :offset="1">
           <div class="grid-content bg-purple">
@@ -17,11 +41,6 @@
           </div>
         </el-col>
         <el-col :span="6">
-          <div class="grid-content bg-purple">
-            <!--          <el-input v-model="params.keywords" size="small" clearable placeholder="IP、port" class="input-with-select" @keyup.enter.native="handleFilter">-->
-            <!--            <el-button slot="append" icon="el-icon-search" @click="handleFilter"></el-button>-->
-            <!--          </el-input>-->
-          </div>
         </el-col>
         <el-col :span="3"><div class="grid-content bg-purple"></div></el-col>
       </el-row>
@@ -68,7 +87,7 @@
 </template>
 
 <script>
-import { getServerList, createServer, deleteServer, updateServer } from '@/api/redis_server'
+import { getServerList, createServer, deleteServer, updateServer,findCluster } from '@/api/redis'
 // import { getSupplierList } from '@/api/supplier'
 // import { getManufactoryList } from '@/api/manufactory'
 // import { getIdcList } from '@/api/idc'
@@ -90,7 +109,7 @@ export default {
       dialogVisibleUpdate: false,
       updateServerInfo: {},
       serverInfo: {},
-      // detailForm: {},
+      queryParams: {},
       createString: '立即创建',
       updateString: '立即更新',
       totalNum: 0,
@@ -112,8 +131,8 @@ export default {
       getServerList(this.params).then(
           // 获取redis集群列表
           res => {
-            this.server = res.results
-            this.totalNum = res.count
+            this.server = res.result
+            this.totalNum = res.total
           },
           err => {
             this.$message({
@@ -121,18 +140,24 @@ export default {
               message: err
             })
           }
-      )
+      ).catch(err=> {
+        this.$message({
+          type: 'error',
+          message: err
+        })
+      })
     },
     handleSubmitCreate(value) {
       // 创建服务器
       createServer(value).then(
-          () => {
+          res => {
+            const msg = res.message
             this.fetchData()
             this.dialogVisibleCreate = false
-            this.$refs.serverCreateForm.form.resetFields().catch(err => {})
+            this.$refs.serverCreateForm.reset()
             this.$message({
               type: 'success',
-              message: '创建成功'
+              message: msg
             })
           },
           error => {
@@ -141,7 +166,12 @@ export default {
               message: error
             })
           }
-      )
+      ).catch(err => {
+        this.$message({
+          type: 'error',
+          message: err
+        })
+      })
     },
     handleSubmitUpdate(value) {
       // 更新服务器
@@ -159,7 +189,12 @@ export default {
               type: 'error',
               message: err.response
             })
-          })
+          }).catch(err => {
+        this.$message({
+          type: 'error',
+          message: err
+        })
+      })
     },
     handleDialogCreate() {
       // 弹出服务器新增弹框
@@ -191,13 +226,18 @@ export default {
               message: err
             })
           }
-      )
+      ).catch(err => {
+        this.$message({
+          type: 'error',
+          message: err
+        })
+      })
     },
     handleOpertionServer(id) {
       // 操作redis 查询、删除等操作
       this.$store.state.redis.server_id = id
       this.$router.push({
-        path: '/redis/request'
+        path: '/redis/ops'
       })
     },
     handleCurrentChange(val) {
@@ -243,7 +283,12 @@ export default {
                     type: 'success',
                     message: '删除成功!'
                   })
-                })
+                }).catch(err => {
+              this.$message({
+                type: 'error',
+                message: err
+              })
+            })
           },
           err => {
             this.$message({
@@ -252,6 +297,21 @@ export default {
             })
           })
       this.$refs.serverListTable.$refs.listTable.clearSelection()
+    },
+    handleQuery() {
+      findCluster(this.queryParams).then(
+          res => {
+            this.server = res.result
+            this.totalNum = res.total
+          }).catch(err => {
+        this.$message({
+          type: 'error',
+          message: err
+        })
+      })
+    },
+    resetQuery() {
+      this.queryParams = {}
     }
   }
 }
@@ -259,13 +319,6 @@ export default {
 </script>
 
 <style  scoped>
-/*.server {*/
-/*  padding: 10px;*/
-/*  margin-top: 10px;*/
-/*}*/
-/*.el-col {*/
-/*  border-radius: 4px;*/
-/*}*/
 .grid-content {
   border-radius: 4px;
   min-height: 36px;

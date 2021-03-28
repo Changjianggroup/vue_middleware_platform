@@ -83,10 +83,10 @@
 </template>
 
 <script>
-import { getServerList } from '@/api/redis_server'
+import { getServerList } from '@/api/redis'
 import { getUserList } from '@/api/users'
 import { getGroupList } from '@/api/groups'
-import { getRabbitmqServerList } from '@/api/rabbitmq_server'
+import { getRabbitmqServerList } from '@/api/rabbitmq'
 import { mapGetters } from 'vuex'
 export default {
     name: 'dashboard',

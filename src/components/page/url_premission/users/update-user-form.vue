@@ -7,9 +7,6 @@
       <el-form-item label="邮箱地址" prop="email">
         <el-input v-model="form.email" placeholder="请输入email"></el-input>
       </el-form-item>
-      <el-form-item label="电话" prop="password">
-        <el-input v-model="form.phone" placeholder="请输入密码"></el-input>
-      </el-form-item>
       <el-form-item class="button-right">
         <el-button size="small" @click="cancelForm">取消</el-button>
         <el-button size="small" type="primary" @click="submitForm">{{ value }}</el-button>
@@ -55,9 +52,6 @@ export default {
           { required: true, message: '请输入用户名', trigger: 'blur' },
           { validator: validateInput, trigger: ['change', 'blur'] },
           { max: 150, message: '长度不能超过150个字符', trigger: 'blur' }
-        ],
-        email: [
-          { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
         ],
       }
     }

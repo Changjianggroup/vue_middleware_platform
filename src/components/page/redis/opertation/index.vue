@@ -10,7 +10,7 @@
         <div class="grid-one">
           <div class="redis_cluster_select">
             <div class="name_select">
-              <el-tag>redis集群选择（cluster_name)</el-tag>
+              <el-tag>redis集群选择（name)</el-tag>
               <el-select
                   v-model="value_cluster_name"
                   :remote-method="remoteSearchRedisClusterName"
@@ -26,9 +26,9 @@
                   @change="setSelectedHosts">
                 <el-option
                     v-for="item in cluster_options"
-                    :key="item.cluster_name"
-                    :label="item.cluster_name"
-                    :value="item.cluster_name">
+                    :key="item.name"
+                    :label="item.name"
+                    :value="item.name">
                 </el-option>
               </el-select>
             </div>
@@ -75,13 +75,16 @@
           <div class="get_key_value">
             <el-collapse>
               <el-collapse-item title="查询键值" name="1">
-                <el-input
-                    v-model="input_key_for_value"
-                    placeholder="请输入要查询的键(key)"
-                    clearable
-                    style="width: 40%">
-                </el-input>
-                <el-button type="primary" plain @click="handleGetKey">开始查询</el-button>
+               <el-col>
+                 <el-input
+                     v-model="input_pattern_for_key_value"
+                     placeholder="请输入要查询的key,模糊字符串以‘*’代替"
+                     clearable
+                     style="width: 40%">
+                 </el-input>
+                 <el-button type="primary" plain @click="handleGetKeys">查询</el-button>
+                 <el-tag type="danger">模糊查询请以'*'代替查询key中的模糊字符串,'*'匹配0-N个字符</el-tag>
+               </el-col>
               </el-collapse-item>
               <el-collapse-item title="TTL查询" name="2">
                 <el-input
@@ -93,22 +96,44 @@
                 <el-button type="primary" plain @click="handleGetKeyTTL">开始查询</el-button>
               </el-collapse-item>
               <el-collapse-item title="删除键-值(key-value)" name="3">
-                <el-input
-                    v-model="input_key_for_del"
-                    placeholder="请输入要删除的键(key)"
-                    clearable
-                    style="width: 40%">
-                </el-input>
-                <el-popconfirm
-                    confirm-button-text="好的"
-                    cancel-button-text="不用了"
-                    icon="el-icon-info"
-                    icon-color="red"
-                    title="确定删除吗？"
-                    @confirm="handleDelKey"
-                >
-                  <el-button slot="reference" type="danger">删除</el-button>
-                </el-popconfirm>
+                <el-col>
+                  <el-tag>精确删除</el-tag>
+                  <el-input
+                      v-model="input_key_for_del"
+                      placeholder="请输入要删除的键(key)"
+                      clearable
+                      style="width: 40%">
+                  </el-input>
+                  <el-popconfirm
+                      confirm-button-text="好的"
+                      cancel-button-text="不用了"
+                      icon="el-icon-info"
+                      icon-color="red"
+                      title="确定删除吗？"
+                      @confirm="handleDelKey"
+                  >
+                    <el-button slot="reference" type="danger">删除</el-button>
+                  </el-popconfirm>
+                </el-col>
+             <el-col>
+               <el-tag>模糊删除</el-tag>
+               <el-input
+                   v-model="input_pattern_key_for_del"
+                   placeholder="请输入要删除的模糊键(key)，'*'代替模糊字符串"
+                   clearable
+                   style="width: 40%">
+               </el-input>
+               <el-popconfirm
+                   confirm-button-text="好的"
+                   cancel-button-text="不用了"
+                   icon="el-icon-info"
+                   icon-color="red"
+                   title="确定删除吗？"
+                   @confirm="handleDelPatternKey"
+               >
+                 <el-button slot="reference" type="danger">删除</el-button>
+               </el-popconfirm>
+             </el-col>
               </el-collapse-item>
               <el-collapse-item title="新建键-值(key-value)" name="4">
                 <el-input
@@ -134,7 +159,7 @@
 </template>
 
 <script>
-import { getServerList, showALLKey, showDBSize, getKey, getKeyTTL, delKey, createKey, clusterNode, clusterInfo } from '@/api/redis_server'
+import { getServerList, showDBSize, getKeys, getKeyTTL, delKey, delPatternKeys,createKey, clusterNode, clusterInfo } from '@/api/redis'
 // import { getSupplierList } from '@/api/supplier'
 // import { getManufactoryList } from '@/api/manufactory'
 // import { getIdcList } from '@/api/idc'
@@ -147,17 +172,17 @@ export default {
       value_id: '',
       value_cluster_name: '',
       value_hosts: '',
-      cluster_list: [],
+      server_list: [],
       loading: false,
       result_code: '',
       result_msg: '',
       totalNum: 0,
-      server: [],
-      input_key_for_value: '',
+      input_pattern_for_key_value: '',
       input_key_for_ttl: '',
       input_key_for_del: '',
       input_key_for_create: '',
       input_value_for_create: '',
+      input_pattern_key_for_del: '',
       selected_server_id: null,
       params: {
         page: 1,
@@ -176,21 +201,16 @@ export default {
       getServerList(this.params).then(
           // 获取redis集群列表
           res => {
-            this.server = res.results
-            this.totalNum = res.count
+            this.server_list = res.result
+            this.totalNum = res.total
             //
-            this.cluster_list = this.server.map(item => {
-              return { id: `${item.id}`, hosts: `${item.hosts}`, cluster_name: `${item.cluster_name}` }
-            })
-
             if (this.$store.state.redis.server_id !== 0) {
-              // this.value = this.$store.state.redis.server_id
-              this.value_cluster_name = this.cluster_list.find(item => {
+              this.value_cluster_name = this.server_list.find(item => {
                 if (parseInt(item.id) === this.$store.state.redis.server_id) {
                   return item
                 }
-              }).cluster_name
-              this.value_hosts = this.cluster_list.find(item => {
+              }).name
+              this.value_hosts = this.server_list.find(item => {
                 if (parseInt(item.id) === this.$store.state.redis.server_id) {
                   return item
                 }
@@ -203,18 +223,19 @@ export default {
               message: err
             })
           }
-      )
+      ).catch( err => {
+        this.$message({
+        type: 'error',
+        message: err
+      })})
     },
     remoteSearchRedisClusterName(query) {
-      this.cluster_list = this.server.map(item => {
-        return { id: `${item.id}`, hosts: `${item.hosts}`, cluster_name: `${item.cluster_name}` }
-      })
       if (query !== '') {
         this.loading = true
         setTimeout(() => {
           this.loading = false
-          this.cluster_options = this.cluster_list.filter(item => {
-            return item.cluster_name.toLowerCase()
+          this.cluster_options = this.server_list.filter(item => {
+            return item.name.toLowerCase()
                 .indexOf(query.toLowerCase()) > -1
           })
         }, 200)
@@ -223,14 +244,11 @@ export default {
       }
     },
     remoteSearchRedisClusterHosts(query) {
-      this.cluster_list = this.server.map(item => {
-        return { id: `${item.id}`, hosts: `${item.hosts}`, cluster_name: `${item.cluster_name}` }
-      })
       if (query !== '') {
         this.loading = true
         setTimeout(() => {
           this.loading = false
-          this.cluster_options = this.cluster_list.filter(item => {
+          this.cluster_options = this.server_list.filter(item => {
             return item.hosts.toLowerCase()
                 .indexOf(query.toLowerCase()) > -1
           })
@@ -244,21 +262,18 @@ export default {
         if (item.hosts === this.value_hosts) {
           return item
         }
-      }).cluster_name
+      }).name
     },
     setSelectedHosts() {
-      // this.cluster_options = this.server.map(i => {
-      //   return { value: `${i.id}`, label: `${i.cluster_name}` }
-      // })
       this.value_hosts = this.cluster_options.find(item => {
-        if (item.cluster_name === this.value_cluster_name) {
+        if (item.name === this.value_cluster_name) {
           return item
         }
       }).hosts
     },
     handlershowALLKey() {
-      this.value_id = this.cluster_list.find(item => {
-        if (item.cluster_name === this.value_cluster_name) {
+      this.value_id = this.cserver_list.find(item => {
+        if (item.name === this.value_cluster_name) {
           return item
         }
       }).id
@@ -281,24 +296,23 @@ export default {
       )
     },
     handlershowDBSize() {
-      const obj_item = this.cluster_list.find(item => {
-        if (item.cluster_name === this.value_cluster_name) {
+      const obj_item = this.server_list.find(item => {
+        if (item.name === this.value_cluster_name) {
           return item
         }
-      })
-      this.value_id = obj_item.id
-      showDBSize(this.value_id).then(
+      }).id
+      showDBSize(obj_item).then(
           // 获取redis集群列表
           res => {
             let msg = "\n"
-            if ( res.msg instanceof Object) {
+            if ( res.message instanceof Object) {
               for(var key in  res.msg){
                 msg = msg + key + ":" + '\n'
-                msg = msg + res.msg[key] + '\n'
+                msg = msg + res.message[key] + '\n'
               }
               // msg = JSON.stringify(res.msg).toString()
             } else {
-              msg = res.msg
+              msg = res.message
             }
             this.result_code = '返回code：' + res.code
             this.result_msg = '返回结果：' + msg
@@ -311,31 +325,44 @@ export default {
           }
       )
     },
-    handleGetKey() {
-      this.value_id = this.cluster_list.find(item => {
-        if (item.cluster_name === this.value_cluster_name) {
+    handleGetKeys() {
+      this.value_id = this.server_list.find(item => {
+        if (item.name === this.value_cluster_name) {
           return item
         }
       }).id
       this.kwargs.id = this.value_id
-      this.kwargs.key = this.input_key_for_value
-      getKey(this.kwargs).then(
-          // 获取redis集群列表
+      this.kwargs.pattern = this.input_pattern_for_key_value
+      if (this.input_pattern_for_key_value === '*') {
+        this.$message({
+          type: 'error',
+          message: '无法查询所有键值对'
+      })}else {
+      getKeys(this.kwargs).then(
           res => {
-            this.result_code = '返回code：' + res.code
-            this.result_msg = '返回结果：\n' + res.msg
-          },
-          err => {
-            this.$message({
-              type: 'error',
-              message: err
-            })
-          }
-      )
+            const key_list = res.message
+            if (key_list.length === 0) {
+              this.result_code = '返回code：' + res.code
+              this.result_msg = '返回结果：\n' + 'None'
+            } else if (typeof key_list === "string") {
+              this.result_code = '返回code：' + res.code
+              this.result_msg = '返回结果：\n' + res.message
+            } else {
+              this.result_msg = '返回结果：\n'
+              for(var index=0;index<key_list.length; index++) {
+                this.result_msg = this.result_msg + JSON.stringify(key_list[index]) + '\n'
+              }
+                    }
+              }).catch( err =>  {
+        this.$message({
+          type: 'error',
+          message: err
+        })
+      })}
     },
     handleGetKeyTTL() {
-      this.value_id = this.cluster_list.find(item => {
-        if (item.cluster_name === this.value_cluster_name) {
+      this.value_id = this.server_list.find(item => {
+        if (item.name === this.value_cluster_name) {
           return item
         }
       }).id
@@ -345,7 +372,7 @@ export default {
           // 获取redis集群列表
           res => {
             this.result_code = '返回code：' + res.code
-            this.result_msg = '返回结果：' + res.msg
+            this.result_msg = '返回结果：' + res.message
           },
           err => {
             this.$message({
@@ -356,8 +383,8 @@ export default {
       )
     },
     handleDelKey() {
-      this.value_id = this.cluster_list.find(item => {
-        if (item.cluster_name === this.value_cluster_name) {
+      this.value_id = this.server_list.find(item => {
+        if (item.name === this.value_cluster_name) {
           return item
         }
       }).id
@@ -367,14 +394,11 @@ export default {
           // 获取redis集群列表
           res => {
             this.result_code = '返回code：' + res.code
-            if (parseInt(res.msg) === 1) {
+            if (parseInt(res.message) === 1) {
               this.result_msg = '返回结果：成功删除'
             }
-            if (parseInt(res.msg) === 0) {
+            if (parseInt(res.message) === 0) {
               this.result_msg = '返回结果：不存在该键'
-            }
-            if (parseInt(res.msg) > 1) {
-              this.result_msg = '返回结果：成功删除' + res.msg + '个键'
             }
           },
           err => {
@@ -385,9 +409,32 @@ export default {
           }
       )
     },
+    handleDelPatternKey() {
+      this.value_id = this.server_list.find(item => {
+        if (item.name === this.value_cluster_name) {
+          return item
+        }
+      }).id
+      this.kwargs.id = this.value_id
+      this.kwargs.pattern = this.input_pattern_key_for_del
+      delPatternKeys(this.kwargs).then(
+          res => {
+            const key_list = res.message
+            if (typeof key_list === "string") {
+              this.result_code = '返回code：' + res.code
+              this.result_msg = '返回结果：\n' + res.message
+            } else {
+              this.result_msg = '返回结果：\n'
+              for(var index=0;index<key_list.length; index++) {
+                this.result_msg = this.result_msg + JSON.stringify(key_list[index]) + '\n'
+              }
+            }
+          }
+      )
+    },
     handleCreateKey() {
-      this.value_id = this.cluster_list.find(item => {
-        if (item.cluster_name === this.value_cluster_name) {
+      this.value_id = this.server_list.find(item => {
+        if (item.name === this.value_cluster_name) {
           return item
         }
       }).id
@@ -397,8 +444,8 @@ export default {
       createKey(this.kwargs).then(
           // 获取redis集群列表
           res => {
-            this.result_code = '返回结果：' + res
-            this.result_msg = ''
+            this.result_code = '返回结果：' + res.code
+            this.result_msg = res.message
           },
           err => {
             this.$message({
@@ -409,8 +456,8 @@ export default {
       )
     },
     handlershowClusterInfo() {
-      this.value_id = this.cluster_list.find(item => {
-        if (item.cluster_name === this.value_cluster_name) {
+      this.value_id = this.server_list.find(item => {
+        if (item.name === this.value_cluster_name) {
           return item
         }
       }).id
@@ -448,8 +495,8 @@ export default {
       )
     },
     handlershowClusterNode() {
-      this.value_id = this.cluster_list.find(item => {
-        if (item.cluster_name === this.value_cluster_name) {
+      this.value_id = this.server_list.find(item => {
+        if (item.name === this.value_cluster_name) {
           return item
         }
       }).id

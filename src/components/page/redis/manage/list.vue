@@ -16,7 +16,7 @@
               <span>{{ props.row.id }}</span>
             </el-form-item>
             <el-form-item label="redis集群名:">
-              <span>{{ props.row.cluster_name }}</span>
+              <span>{{ props.row.name }}</span>
             </el-form-item>
             <el-form-item label="host列表:">
               <span>{{ props.row.hosts }}</span>
@@ -38,7 +38,7 @@
         label="redis集群名"
         min-width="100">
         <template slot-scope="scope">
-          <span>{{ scope.row.cluster_name }}</span>
+          <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -100,7 +100,7 @@ export default {
       this.$emit('edit', server)
     },
     serverDelete(server) {
-      this.$confirm(`此操作将删除该${server.cluster_name} 集群记录, 是否继续?`, '删除redis集群', {
+      this.$confirm(`此操作将删除该${server.name} 集群记录, 是否继续?`, '删除redis集群', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
