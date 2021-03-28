@@ -305,14 +305,14 @@ export default {
           // 获取redis集群列表
           res => {
             let msg = "\n"
-            if ( res.message instanceof Object) {
-              for(var key in  res.msg){
+            if ( res.result instanceof Object) {
+              for(var key in  res.result){
                 msg = msg + key + ":" + '\n'
-                msg = msg + res.message[key] + '\n'
+                msg = msg + res.result[key] + '\n'
               }
-              // msg = JSON.stringify(res.msg).toString()
+              // msg = JSON.stringify(res.result).toString()
             } else {
-              msg = res.message
+              msg = res.result
             }
             this.result_code = '返回code：' + res.code
             this.result_msg = '返回结果：' + msg
@@ -465,17 +465,17 @@ export default {
               // 获取cluster info
               res => {
                 let msg = ""
-                if ( res.msg instanceof Object) {
-                  for(var key in  res.msg){
+                if ( res.result instanceof Object) {
+                  for(var key in  res.result){
                     msg = msg + '\n'
                     msg = msg + "集群节点" + key + ":" + '\n'
-                    if (res.msg[key] instanceof Object){
-                      for (var value_key in res.msg[key]) {
+                    if (res.result[key] instanceof Object){
+                      for (var value_key in res.result[key]) {
                         msg = msg + value_key + ":" + '\n'
-                        msg = msg + res.msg[key][value_key] + '\n'
+                        msg = msg + res.result[key][value_key] + '\n'
                       }
                     } else {
-                      msg = msg + res.msg[key] + '\n'
+                      msg = msg + res.result[key] + '\n'
                     }
 
                   }
@@ -505,18 +505,18 @@ export default {
               res => {
                 let msg = ""
                 if (res.code === 200){
-                  for (var i in res.msg)
+                  for (var i in res.result)
                   {
                     msg = msg + '\n'
-                    msg = msg + "集群节点" + res.msg[i]['host'] + ":" + res.msg[i]['port'] + "\n"
-                    msg = msg + 'id:' + res.msg[i]['id'] + '\n'
-                    msg = msg + 'cluster-bus-port:' + res.msg[i]['cluster-bus-port'] + '\n'
-                    msg = msg + 'flags:' + res.msg[i]['flags'] + '\n'
-                    msg = msg + 'master:' + res.msg[i]['master'] + '\n'
-                    msg = msg + 'ping-sent:' + res.msg[i]['ping-sent'] + '\n'
-                    msg = msg + 'pong-recv:' + res.msg[i]['pong-recv'] + '\n'
-                    msg = msg + 'link-state:' + res.msg[i]['link-state'] + '\n'
-                    msg = msg + 'migrations:' + res.msg[i]['migrations'] + '\n'
+                    msg = msg + "集群节点" + res.result[i]['host'] + ":" + res.result[i]['port'] + "\n"
+                    msg = msg + 'id:' + res.result[i]['id'] + '\n'
+                    msg = msg + 'cluster-bus-port:' + res.result[i]['cluster-bus-port'] + '\n'
+                    msg = msg + 'flags:' + res.result[i]['flags'] + '\n'
+                    msg = msg + 'master:' + res.result[i]['master'] + '\n'
+                    msg = msg + 'ping-sent:' + res.result[i]['ping-sent'] + '\n'
+                    msg = msg + 'pong-recv:' + res.result[i]['pong-recv'] + '\n'
+                    msg = msg + 'link-state:' + res.result[i]['link-state'] + '\n'
+                    msg = msg + 'migrations:' + res.result[i]['migrations'] + '\n'
                   }
                 } else {
                   msg = msg + res.msg
