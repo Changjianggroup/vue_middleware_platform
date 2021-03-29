@@ -94,7 +94,7 @@ export function createKey(params) {
 }
 export function clusterNode(id) {
   return request({
-    url: '/api/v1/redis/cluster_node/',
+    url: '/api/v1/redis/node_info/',
     method: 'post',
     data: { id: id }
   })
