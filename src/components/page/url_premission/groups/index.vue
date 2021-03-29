@@ -137,37 +137,50 @@ export default {
         result => {
           this.fetchData()
           this.dialogVisibleCreate = false
-          this.$message({
-            type: 'success',
-            message: result.message
-          })
-        },
-        err => {
-          this.$message({
-            type: 'error',
-            message: err.response.message
-          })
+          if(result.code === 200|| result.code === 201) {
+            this.$message({
+              type: 'success',
+              message: result.message
+            })
+            this.$refs.gform.reset()
+          }else {
+            this.$message({
+              type: 'error',
+              message: result.message
+            })
+          }
         }
-      )
+      ).catch(err=> {
+        this.$message({
+          type: 'error',
+          message: err
+        })
+      })
     },
     handleSubmitUpdate(value) {
       // 编辑更新用户组updatePermissionGroup
       const data = {id: value.id, group_name:value.group_name, desc: value.desc}
       updatePermissionGroup(data).then(
-        () => {
+        res => {
+          if(res.code === 200 || res.code ===201) {
+            this.$message({
+              type: 'success',
+              message: res.message
+            })
+          }else {
+            this.$message({
+              type: 'error',
+              message: res.message
+            })
+          }
           this.fetchData()
           this.dialogVisibleUpdate = false
-          this.$message({
-            type: 'success',
-            message: '更新成功'
-          })
-        },
-        err => {
-          this.$message({
-            type: 'error',
-            message: err.response.data.detail
-          })
+        }).catch(err => {
+        this.$message({
+          type: 'error',
+          message: err
         })
+      })
     },
    getDiffrenceSetData (dataA, dataB) {
     for (let i = dataA.length - 1; i >= 0; i--) {
@@ -185,7 +198,6 @@ export default {
       this.groupForms = value
       this.perDialogTitle = value.group_name + '组权限修改'
       getUrlPermission(this.queryUrlAllParams).then( response1=> {
-        console.log(response1)
            this.all_perm = response1.result
         const all_perm_list = Object.assign({}, this.all_perm);
         this.queryUrlParams.group_id = value.id
@@ -224,20 +236,24 @@ export default {
     handleDelete(id) {
       // 删除用户组
       deletePermissionGroup(id).then(
-        () => {
-          if (this.totalNum % this.params.page_size === 1) {
-            this.params.page = this.params.page - 1
+        res => {
+          if (res.code ===200 || res.code === 201|| res.code === 204) {
+            this.$message({
+              type: 'success',
+              message: res.message
+            })
+          } else {
+            this.$message({
+              type: 'error',
+              message: res.message
+            })
           }
           this.fetchData()
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          })
         }).catch(
           err => {
             this.$message({
               type: 'error',
-              message: err.response.data.detail
+              message: err
             })
           }
       )

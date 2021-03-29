@@ -76,6 +76,11 @@ export default {
     },
     cancelForm() {
       this.$emit('cancel')
+    },
+    reset() {
+      this.form.username = ''
+      this.form.password = ''
+      this.form.email = ''
     }
   }
 }

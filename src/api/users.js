@@ -21,8 +21,8 @@ export function createUser(params) {
 // 更新用户
 export function updateUser(params) {
   return request({
-    url: '/users/' + params.id + '/',
-    method: 'patch',
+    url: '/users/update_user/',
+    method: 'post',
     data: params
   })
 }

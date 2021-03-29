@@ -271,30 +271,6 @@ export default {
         }
       }).hosts
     },
-    handlershowALLKey() {
-      this.value_id = this.cserver_list.find(item => {
-        if (item.name === this.value_cluster_name) {
-          return item
-        }
-      }).id
-      showALLKey(this.value_id).then(
-          // 获取redis集群列表
-          res => {
-            let str_key = '\n'
-            for (var i in res.msg) {
-              str_key = str_key + res.msg[i] + '\n'
-            }
-            this.result_code = '返回code：' + res.code
-            this.result_msg = '返回结果：' + str_key
-          },
-          err => {
-            this.$message({
-              type: 'error',
-              message: err
-            })
-          }
-      )
-    },
     handlershowDBSize() {
       const obj_item = this.server_list.find(item => {
         if (item.name === this.value_cluster_name) {
@@ -304,27 +280,31 @@ export default {
       showDBSize(obj_item).then(
           // 获取redis集群列表
           res => {
-            let msg = "\n"
-            if ( res.result instanceof Object) {
-              for(var key in  res.result){
-                msg = msg + key + ":" + '\n'
-                msg = msg + res.result[key] + '\n'
+            if(res.code === 403) {
+                this.$message({
+                  type: 'error',
+                  message: res.message
+                })
+            }else {
+              let msg = "\n"
+              if ( res.result instanceof Object) {
+                for(var key in  res.result){
+                  msg = msg + key + ":" + '\n'
+                  msg = msg + res.result[key] + '\n'
+                }
+                // msg = JSON.stringify(res.result).toString()
+              } else {
+                msg = res.result
               }
-              // msg = JSON.stringify(res.result).toString()
-            } else {
-              msg = res.result
+              this.result_code = '返回code：' + res.code
+              this.result_msg = '返回结果：' + msg
             }
-            this.result_code = '返回code：' + res.code
-            this.result_msg = '返回结果：' + msg
-          },
-          err => {
-            this.$message({
-              type: 'error',
-              message: err
-            })
-          }
-      )
-    },
+            }).catch( err => {
+        this.$message({
+          type: 'error',
+          message: err
+        })
+    })},
     handleGetKeys() {
       this.value_id = this.server_list.find(item => {
         if (item.name === this.value_cluster_name) {
@@ -340,20 +320,27 @@ export default {
       })}else {
       getKeys(this.kwargs).then(
           res => {
-            const key_list = res.message
-            if (key_list.length === 0) {
-              this.result_code = '返回code：' + res.code
-              this.result_msg = '返回结果：\n' + 'None'
-            } else if (typeof key_list === "string") {
-              this.result_code = '返回code：' + res.code
-              this.result_msg = '返回结果：\n' + res.message
+            if (res.code === 403) {
+              this.$message({
+                type: 'error',
+                message: res.message
+              })
             } else {
-              this.result_msg = '返回结果：\n'
-              for(var index=0;index<key_list.length; index++) {
-                this.result_msg = this.result_msg + JSON.stringify(key_list[index]) + '\n'
+              const key_list = res.message
+              if (key_list.length === 0) {
+                this.result_code = '返回code：' + res.code
+                this.result_msg = '返回结果：\n' + 'None'
+              } else if (typeof key_list === "string") {
+                this.result_code = '返回code：' + res.code
+                this.result_msg = '返回结果：\n' + res.message
+              } else {
+                this.result_msg = '返回结果：\n'
+                for (var index = 0; index < key_list.length; index++) {
+                  this.result_msg = this.result_msg + JSON.stringify(key_list[index]) + '\n'
+                }
               }
-                    }
-              }).catch( err =>  {
+            }
+          }).catch( err =>  {
         this.$message({
           type: 'error',
           message: err
@@ -371,9 +358,17 @@ export default {
       getKeyTTL(this.kwargs).then(
           // 获取redis集群列表
           res => {
-            this.result_code = '返回code：' + res.code
-            this.result_msg = '返回结果：' + res.message
-          },
+            if (res.code === 403) {
+            this.$message({
+              type: 'error',
+              message: res.message
+            })
+          } else {
+              this.result_code = '返回code：' + res.code
+              this.result_msg = '返回结果：' + res.message
+            }
+
+          }).catch(
           err => {
             this.$message({
               type: 'error',
@@ -393,6 +388,12 @@ export default {
       delKey(this.kwargs).then(
           // 获取redis集群列表
           res => {
+            if (res.code === 403) {
+              this.$message({
+                type: 'error',
+                message: res.message
+              })
+            } else {
             this.result_code = '返回code：' + res.code
             if (parseInt(res.message) === 1) {
               this.result_msg = '返回结果：成功删除'
@@ -400,7 +401,7 @@ export default {
             if (parseInt(res.message) === 0) {
               this.result_msg = '返回结果：不存在该键'
             }
-          },
+          }}).catch(
           err => {
             this.$message({
               type: 'error',
@@ -418,19 +419,30 @@ export default {
       this.kwargs.id = this.value_id
       this.kwargs.pattern = this.input_pattern_key_for_del
       delPatternKeys(this.kwargs).then(
-          res => {
-            const key_list = res.message
-            if (typeof key_list === "string") {
-              this.result_code = '返回code：' + res.code
-              this.result_msg = '返回结果：\n' + res.message
-            } else {
-              this.result_msg = '返回结果：\n'
-              for(var index=0;index<key_list.length; index++) {
-                this.result_msg = this.result_msg + JSON.stringify(key_list[index]) + '\n'
+            res => {
+              if (res.code === 403) {
+                this.$message({
+                  type: 'error',
+                  message: res.message
+                })
+              } else {
+                const key_list = res.message
+                if (typeof key_list === "string") {
+                  this.result_code = '返回code：' + res.code
+                  this.result_msg = '返回结果：\n' + res.message
+                } else {
+                  this.result_msg = '返回结果：\n'
+                  for (var index = 0; index < key_list.length; index++) {
+                    this.result_msg = this.result_msg + JSON.stringify(key_list[index]) + '\n'
+                  }
+                }
               }
-            }
-          }
-      )
+            }).catch( err => {
+        this.$message({
+          type: 'error',
+          message: err
+        })
+      })
     },
     handleCreateKey() {
       this.value_id = this.server_list.find(item => {
@@ -444,9 +456,16 @@ export default {
       createKey(this.kwargs).then(
           // 获取redis集群列表
           res => {
-            this.result_code = '返回结果：' + res.code
-            this.result_msg = res.message
-          },
+            if (res.code === 403) {
+              this.$message({
+                type: 'error',
+                message: res.message
+              })
+            } else {
+              this.result_code = '返回结果：' + res.code
+              this.result_msg = res.message
+            }
+          }).catch(
           err => {
             this.$message({
               type: 'error',
@@ -464,6 +483,12 @@ export default {
       clusterInfo(this.value_id).then(
               // 获取cluster info
               res => {
+                if (res.code === 403) {
+                this.$message({
+                  type: 'error',
+                  message: res.message
+                })
+              } else {
                 let msg = ""
                 if ( res.result instanceof Object) {
                   for(var key in  res.result){
@@ -485,14 +510,13 @@ export default {
                 }
                 this.result_code = '返回code：' + res.code
                 this.result_msg = '返回结果：' + msg
-              },
+              }}).catch(
               err => {
-                this.$message({
-                  type: 'error',
-                  message: err
-                })
-              }
-      )
+            this.$message({
+              type: 'error',
+              message: err
+            })
+          })
     },
     handlershowClusterNode() {
       this.value_id = this.server_list.find(item => {
@@ -503,6 +527,12 @@ export default {
       clusterNode(this.value_id).then(
               // 获取cluster info
               res => {
+                if (res.code === 403 || res.code === 500) {
+                  this.$message({
+                    type: 'error',
+                    message: res.message
+                  })
+                } else {
                 let msg = ""
                 if (res.code === 200){
                   for (var i in res.result)
@@ -523,13 +553,13 @@ export default {
                 }
                 this.result_code = '返回code：' + res.code
                 this.result_msg = '返回结果：' + msg
-              },
+              }}).catch(
               err => {
-                this.$message({
-                  type: 'error',
-                  message: err.response
-                })
-              }
+            this.$message({
+              type: 'error',
+              message: err.response
+            })
+          }
       )
     }
   }

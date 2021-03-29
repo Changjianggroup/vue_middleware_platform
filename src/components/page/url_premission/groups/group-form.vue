@@ -56,6 +56,10 @@ export default {
     },
     cancelForm() {
       this.$emit('cancel')
+    },
+    reset() {
+      this.form.group_name = ''
+      this.form.desc = ''
     }
   }
 }

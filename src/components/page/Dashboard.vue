@@ -25,7 +25,7 @@
                     <el-col :span="10">
                         <el-card shadow="hover" :body-style="{padding: '0px'}">
                             <div class="grid-content grid-con-1">
-                              <router-link to="/perm/user">
+                              <router-link to="/perm/users">
                                 <i class="el-icon-user grid-con-icon"></i>
                               </router-link>
                                 <div class="grid-cont-right">
@@ -38,7 +38,7 @@
                     <el-col :span="10">
                         <el-card shadow="hover" :body-style="{padding: '0px'}">
                             <div class="grid-content grid-con-2">
-                              <router-link to="/perm/group">
+                              <router-link to="/perm/groups">
                                 <i class="el-icon-user-solid grid-con-icon"></i>
                               </router-link>
                                 <div class="grid-cont-right">
@@ -63,19 +63,6 @@
                   </div>
                 </el-card>
               </el-col>
-                <el-col :span="10">
-                  <el-card shadow="hover" :body-style="{padding: '0px'}">
-                    <div class="grid-content grid-con-3">
-                      <router-link to="/rabbitmq/management">
-                        <i class="el-icon-chat-dot-round grid-con-icon"></i>
-                      </router-link>
-                      <div class="grid-cont-right">
-                        <div class="grid-num"> {{ rabbitmqClusterNum }}</div>
-                        <div>rabbitmq集群</div>
-                      </div>
-                    </div>
-                  </el-card>
-                </el-col>
               </el-row>
             </el-col>
         </el-row>
@@ -85,8 +72,7 @@
 <script>
 import { getServerList } from '@/api/redis'
 import { getUserList } from '@/api/users'
-import { getGroupList } from '@/api/groups'
-import { getRabbitmqServerList } from '@/api/rabbitmq'
+import { getPermissionGroupList } from '@/api/url_premission'
 import { mapGetters } from 'vuex'
 export default {
     name: 'dashboard',
@@ -122,26 +108,21 @@ export default {
         getServerList().then(
             // 获取服务器个数
             res => {
-              this.redisClusterNum = res.count
+              this.redisClusterNum = res.total
             }
         )
         getUserList(this.params).then(
             // 获取用户数
             res => {
-              this.userNum = res.count
+              this.userNum = res.length
             }
         )
-        getGroupList(this.params).then(
+        getPermissionGroupList(this.params).then(
             // 获取所有用户组
             res => {
-              this.groupNum = res.count
+              this.groupNum = res.total
             }
         )
-          getRabbitmqServerList(this.params).then(
-              res => {
-                  this.rabbitmqClusterNum = res.count
-              }
-          )
       }
         }
 };

@@ -28,8 +28,8 @@ export function deleteServer(id) {
 // 更新服务器
 export function updateServer(params) {
   return request({
-    url: '/api/v1/redis/' + params.id + '/',
-    method: 'patch',
+    url: '/api/v1/redis/update_redis/',
+    method: 'post',
     data: params
   })
 }

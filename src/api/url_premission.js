@@ -28,8 +28,8 @@ export function deletePermissionGroup(id) {
 // 更新权限组
 export function updatePermissionGroup(params) {
     return request({
-        url: '/url_premission/group/' + params.id + '/',
-        method: 'patch',
+        url: '/url_premission/group/update_group/',
+        method: 'post',
         data: params
     })
 }

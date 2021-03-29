@@ -151,22 +151,21 @@ export default {
       // 创建服务器
       createServer(value).then(
           res => {
-            const msg = res.message
-            this.fetchData()
-            this.dialogVisibleCreate = false
-            this.$refs.serverCreateForm.reset()
-            this.$message({
-              type: 'success',
-              message: msg
-            })
-          },
-          error => {
-            this.$message({
-              type: 'error',
-              message: error
-            })
-          }
-      ).catch(err => {
+            if(res.code === 403) {
+              this.$message({
+                type: 'error',
+                message: res.message
+              })
+            }else{
+              this.dialogVisibleCreate = false
+              this.$refs.serverCreateForm.reset()
+              this.$message({
+                type: 'success',
+                message: res.message
+              })
+              this.fetchData()
+            }
+          }).catch(err => {
         this.$message({
           type: 'error',
           message: err
@@ -176,19 +175,20 @@ export default {
     handleSubmitUpdate(value) {
       // 更新服务器
       updateServer(value).then(
-          () => {
+          res => {
+             if(res.code === 403) {
+               this.$message({
+                 type: 'error',
+                 message: res.message
+               })
+             }else {
+               this.$message({
+                 type: 'success',
+                 message: res.message
+               })
+             }
             this.fetchData()
             this.dialogVisibleUpdate = false
-            this.$message({
-              type: 'success',
-              message: '更新成功'
-            })
-          },
-          err => {
-            this.$message({
-              type: 'error',
-              message: err.response
-            })
           }).catch(err => {
         this.$message({
           type: 'error',
@@ -210,23 +210,20 @@ export default {
     handleDeleteServer(id) {
       // 删除Server
       deleteServer(id).then(
-          () => {
-            if (this.totalNum % this.params.page_size === 1) {
-              this.params.page = this.params.page - 1
-            }
-            this.fetchData()
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            })
-          },
-          err => {
-            this.$message({
-              type: 'error',
-              message: err
-            })
-          }
-      ).catch(err => {
+            res => {
+              if(res.code === 403) {
+                this.$message({
+                  type: 'error',
+                  message: res.message
+                })
+              }else{
+                this.$message({
+                  type: 'success',
+                  message: res.message
+                })
+                this.fetchData()
+              }
+            }).catch(err => {
         this.$message({
           type: 'error',
           message: err

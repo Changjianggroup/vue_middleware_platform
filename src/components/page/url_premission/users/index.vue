@@ -120,37 +120,53 @@ export default {
     handleSubmitCreate(value) {
       // 创建用户
       createUser(value).then(
-        () => {
+        res => {
+          if (res.hasOwnProperty('id')) {
+            this.$message({
+              type: 'success',
+              message: '创建成功'
+            })
+          } else  {
+            this.$message({
+              type: 'error',
+              message: res.message
+            })
+          }
           this.fetchData()
-          this.$refs.userCreateForm.$refs.form.resetFields()
+          this.$refs.userCreateForm.reset()
           this.dialogVisibleCreate = false
-          this.$message({
-            type: 'success',
-            message: '创建成功'
-          })
-        },
-        error => {
-          this.$message({
-            type: 'error',
-            message: error.response.data.detail
-          })
         }
-      )
+      ).catch(err => {
+        this.$message({
+          type: 'error',
+          message: err
+        })
+      })
     },
     handleSubmitUpdate(value) {
       // 更新用户信息
-      updateUser(value).then(() => {
-          this.$message({
-            type: 'success',
-            message: '更新用户信息成功'
-      })
+      updateUser(value).then(
+          res => {
+            if (res.code === 200) {
+              this.$message({
+                type: 'success',
+                message: res.message
+              })
+            } else  {
+              this.$message({
+                type: 'error',
+                message: res.message
+              })
+            }
+            this.fetchData()
             this.dialogVisibleUpdate = false
-      }
-      ).catch(err => {this.$message({
-        type: 'error',
-        message: err
+          }
+      ).catch(err => {
+        this.$message({
+          type: 'error',
+          message: err
+        })
       })
-    })
     },
     handleSubmitUpdateUserGroup(id, userid) {
       // 更新用户属组事件
@@ -159,7 +175,6 @@ export default {
       updateUserGroup(data).then(
           response => {
           this.dialogVisibleGroup = false
-          this.fetchData()
             if(response.code === 200 || response.code === 201){
               this.$message({
                 type: 'success',
@@ -171,6 +186,7 @@ export default {
                 message: response.message
               })
             }
+            this.fetchData()
         }).catch(
         error => {
           this.$message({
@@ -205,22 +221,26 @@ export default {
     handleDelete(id) {
       deleteUser(id).then(
         // 删除用户
-        () => {
-          if (this.totalNum % this.params.page_size === 1) {
-            this.params.page = this.params.page - 1
+          response => {
+            if(response === ''){
+              this.$message({
+                type: 'success',
+                message: '删除成功',
+              })
+              this.fetchData()
+            }else{
+              this.$message({
+                type: 'error',
+                message: response.message
+              })
+            }
+          }).catch(
+          error => {
+            this.$message({
+              type: 'error',
+              message: error
+            })
           }
-          this.fetchData()
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          })
-        },
-        error => {
-          this.$message({
-            type: 'error',
-            message: error.response.data.detail
-          })
-        }
       )
     },
     handleChangeUserPass(id, value) {
