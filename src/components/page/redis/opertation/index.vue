@@ -123,16 +123,21 @@
                    clearable
                    style="width: 40%">
                </el-input>
-               <el-popconfirm
-                   confirm-button-text="好的"
-                   cancel-button-text="不用了"
-                   icon="el-icon-info"
-                   icon-color="red"
-                   title="确定删除吗？"
-                   @confirm="handleDelPatternKey"
-               >
-                 <el-button slot="reference" type="danger">删除</el-button>
-               </el-popconfirm>
+               <el-button type="danger" @click="SearchDelPatternKey">删除</el-button>
+               <el-dialog
+                   :visible.sync="dialogVisibleDelPatternKey"
+                   title="可模糊删除键值对"
+                   width="40%"
+                   center>
+                 <pre>{{delPatternKeyValue}}</pre>
+                <span slot="footer" class="dialog-footer">
+<!--              <el-button @click="centerDialogVisible = false">取 消</el-button>-->
+<!--              <el-button type="primary" @click="centerDialogVisible = false">确 定</el-button>-->
+                  <el-button @click="dialogVisibleDelPatternKey = false">取 消</el-button>
+              <el-button type="primary" @click="handleDelPatternKey">确定删除</el-button>
+              </span>
+               </el-dialog>
+
              </el-col>
               </el-collapse-item>
               <el-collapse-item title="新建键-值(key-value)" name="4">
@@ -184,6 +189,9 @@ export default {
       input_value_for_create: '',
       input_pattern_key_for_del: '',
       selected_server_id: null,
+      delPatternKeyValue: '',
+      code_delPatternKeyValue: 200,
+      dialogVisibleDelPatternKey: false,
       params: {
         page: 1,
         keywords: '',
@@ -377,6 +385,50 @@ export default {
           }
       )
     },
+    SearchDelPatternKey() {
+      this.value_id = this.server_list.find(item => {
+        if (item.name === this.value_cluster_name) {
+          return item
+        }
+      }).id
+      this.kwargs.id = this.value_id
+      this.kwargs.pattern = this.input_pattern_key_for_del
+      if (this.input_pattern_key_for_del === '*') {
+        this.$message({
+          type: 'error',
+          message: '无法删除所有键值对'
+        })}else {
+        getKeys(this.kwargs).then(
+            res => {
+              if (res.code === 403) {
+                this.$message({
+                  type: 'error',
+                  message: res.message
+                })
+              } else {
+                const key_list = res.message
+                if (key_list.length === 0) {
+                  this.code_delPatternKeyValue = 400
+                  this.delPatternKeyValue = '没有匹配的键值对'
+                } else if (typeof key_list === "string") {
+                  this.code_delPatternKeyValue = 400
+                  this.delPatternKeyValue = '错误：\n' + res.message
+                } else {
+                  let search_result = ''
+                  for (var index = 0; index < key_list.length; index++) {
+                    search_result = search_result + JSON.stringify(key_list[index]) + '\n'
+                  }
+                  this.delPatternKeyValue = search_result
+                }
+              }
+              this.dialogVisibleDelPatternKey = true
+            }).catch( err =>  {
+          this.$message({
+            type: 'error',
+            message: err
+          })
+        })}
+    },
     handleDelKey() {
       this.value_id = this.server_list.find(item => {
         if (item.name === this.value_cluster_name) {
@@ -418,31 +470,58 @@ export default {
       }).id
       this.kwargs.id = this.value_id
       this.kwargs.pattern = this.input_pattern_key_for_del
-      delPatternKeys(this.kwargs).then(
-            res => {
-              if (res.code === 403) {
-                this.$message({
-                  type: 'error',
-                  message: res.message
-                })
-              } else {
-                const key_list = res.message
-                if (typeof key_list === "string") {
-                  this.result_code = '返回code：' + res.code
-                  this.result_msg = '返回结果：\n' + res.message
-                } else {
-                  this.result_msg = '返回结果：\n'
-                  for (var index = 0; index < key_list.length; index++) {
-                    this.result_msg = this.result_msg + JSON.stringify(key_list[index]) + '\n'
-                  }
-                }
-              }
-            }).catch( err => {
+      if (this.code_delPatternKeyValue === 400) {
         this.$message({
           type: 'error',
-          message: err
+          message: '没有可以删除的键值对或集群错误!'
         })
-      })
+        this.dialogVisibleDelPatternKey = false
+        this.code_delPatternKeyValue = 200
+      } else {
+        this.$prompt('请输入"yes"来确定删除?', '警告', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          inputPlaceholder: '请输入“yes”',
+          type: 'warning'
+        }).then(input => {
+          if (input.value === 'yes') {
+            delPatternKeys(this.kwargs).then(
+                res => {
+                  if (res.code === 403) {
+                    this.$message({
+                      type: 'error',
+                      message: res.message
+                    })
+                  } else {
+                    const key_list = res.message
+                    if (typeof key_list === "string") {
+                      this.result_code = '返回code：' + res.code
+                      this.result_msg = '返回结果：\n' + res.message
+                    } else {
+                      this.result_msg = '返回结果：\n'
+                      for (var index = 0; index < key_list.length; index++) {
+                        this.result_msg = this.result_msg + JSON.stringify(key_list[index]) + '\n'
+                      }
+                    }
+                  }
+                }).catch(err => {
+              this.$message({
+                type: 'error',
+                message: err
+              })
+            })
+            this.code_delPatternKeyValue = 200
+            this.dialogVisibleDelPatternKey = false
+          } else {
+            this.$message({
+              type: 'error',
+              message: '输入"yes"错误'
+            })
+            this.code_delPatternKeyValue = 200
+            this.dialogVisibleDelPatternKey = false
+          }
+        })
+      }
     },
     handleCreateKey() {
       this.value_id = this.server_list.find(item => {
